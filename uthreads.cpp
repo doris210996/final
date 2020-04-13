@@ -221,7 +221,7 @@ int uthread_spawn(void (*f)(void), int priority){
     }
     //printErrors
     return -1;
-}
+}//8
 
 int uthread_change_priority(int tid, int priority){
     if(!_threads.count(tid))
