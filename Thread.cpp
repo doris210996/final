@@ -68,6 +68,11 @@ void Thread::setTimer(int quantum)
 
 }
 
+void Thread::setPriority(int pr)
+{
+    _pr = pr;
+}
+
 struct itimerval Thread::getTimer()
 {
     return _timer;

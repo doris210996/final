@@ -6,10 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/cs/usr/doronbruder/CLionProjects/ex2_os/Thread.cpp
-Thread.h
-/cs/usr/doronbruder/CLionProjects/ex2_os/Thread.h
-
 /cs/usr/doronbruder/CLionProjects/ex2_os/Thread.h
 stdio.h
 -

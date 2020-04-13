@@ -22,6 +22,8 @@ public:
     void setTimer(int quantum);
     struct itimerval getTimer();
     void updateQuantum();
+    void setPriority(int pr);
+
     // sigsetjmp(Thread.getContext,1) == saveBuff
     // siglongjmo(Thread.getContext,1) == loadBuff
 
