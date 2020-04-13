@@ -1,5 +1,6 @@
 #include "Thread.h"
 #define JUMP_VAL 1
+
 #ifdef __x86_64__
 
 
@@ -9,7 +10,6 @@ typedef unsigned long address_t;
 typedef unsigned long address_t;
 #define JB_SP 6
 #define JB_PC 7
-#define MICRO_TO_SEC 1000000
 
 /* A translation is required when using an address of a variable.
    Use this as a black box in your code. */
@@ -45,37 +45,25 @@ address_t translate_address(address_t addr)
 #endif
 
 
+sigjmp_buf env[3];
 
-Thread::Thread(int id, int pr, void (*f)(void), State state): _id(id), _pr(pr), _f(f), _state(state)
+Thread::Thread(int tid, int pr, void (*f)(void), State state): _tid(tid), _pr(pr), _f(f), _state
+(state)
 {
-    _quantum = 0;
+    _soFarQSycels = 0;
     _stack = new char[STACK_SIZE];
     address_t sp, pc;
     sp = (address_t)_stack + STACK_SIZE - sizeof(address_t);
     pc = (address_t)*f;
-    sigsetjmp(_context, 1);
-    (_context->__jmpbuf)[JB_SP] = translate_address(sp);
-    (_context->__jmpbuf)[JB_PC] = translate_address(pc);
-    sigemptyset(&_context->__saved_mask);
+    sigsetjmp(_jmp_buf, JUMP_VAL);
+    (_jmp_buf->__jmpbuf)[JB_SP] = translate_address(sp);
+    (_jmp_buf->__jmpbuf)[JB_PC] = translate_address(pc);
+    sigemptyset(&_jmp_buf->__saved_mask);
 }
 
-void Thread::setTimer(int quantum)
+Thread::~Thread()
 {
-    _timer.it_value.tv_sec = (int)(quantum/MICRO_TO_SEC);
-    _timer.it_value.tv_usec = quantum % MICRO_TO_SEC;
-    _timer.it_interval.tv_sec = (int)(quantum/MICRO_TO_SEC);
-    _timer.it_interval.tv_usec = quantum % MICRO_TO_SEC;
-
-}
-
-void Thread::setPriority(int pr)
-{
-    _pr = pr;
-}
-
-struct itimerval Thread::getTimer()
-{
-    return _timer;
+    delete[] _stack;
 }
 
 void Thread::setState(State state)
@@ -88,14 +76,9 @@ State Thread::getState() const
     return _state;
 }
 
-Thread::~Thread()
-{
-    delete[] _stack;
-}
-
 int Thread::getId() const
 {
-    return _id;
+    return _tid;
 }
 
 int Thread::getPriority() const
@@ -103,18 +86,24 @@ int Thread::getPriority() const
     return _pr;
 }
 
-int Thread::getCurQuantum() const
+void Thread::incQuantums()
 {
-    return _quantum;
+    _soFarQSycels++;
 }
 
-sigjmp_buf& Thread::getContext() {
-    return _context;
+void Thread::setPriority(int pr)
+{
+    _pr = pr;
 }
 
-void Thread::updateQuantum()
+int Thread::getQuantumsAmount() const
 {
-    ++_quantum;
+    return _soFarQSycels;
+}
+
+sigjmp_buf& Thread::getContext()
+{
+    return _jmp_buf;
 }
 
 

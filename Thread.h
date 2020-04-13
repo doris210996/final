@@ -1,5 +1,4 @@
-#ifndef EX2_THREAD_H
-#define EX2_THREAD_H
+
 #include <stdio.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -7,36 +6,52 @@
 #include <sys/time.h>
 #include <iostream>
 #include "uthreads.h"
-enum State {READY, RUNNING, BLOCKED};
+
+enum State {READY, RUNNING, BLOCK};
+
+
 class Thread
 {
+
 public:
-    Thread(int id,int priority,void (*f)(void),State state);
+
+    Thread(int tid, int pr, void (*f)(void), State state);
+
     ~Thread();
+
+
     void setState(State state);
-    [[nodiscard]] State  getState() const;
-    [[nodiscard]] int getId() const;
-    [[nodiscard]] int getPriority() const;
-    [[nodiscard]] int getCurQuantum() const;
-    sigjmp_buf& getContext();
-    void setTimer(int quantum);
-    struct itimerval getTimer();
-    void updateQuantum();
+
+
+    State getState() const;
+
+
+    int getId() const;
+
+
+    int getPriority() const;
+
     void setPriority(int pr);
 
-    // sigsetjmp(Thread.getContext,1) == saveBuff
-    // siglongjmo(Thread.getContext,1) == loadBuff
+
+    void incQuantums();
+
+
+    int getQuantumsAmount() const;
+
+
+    sigjmp_buf& getContext();
+
+
+
+
 
 private:
-    struct itimerval _timer;
-    int _id;
+    int _tid;
     int _pr;
-    int _quantum;
+    int _soFarQSycels;
     void (*_f)(void);
     State _state;
     char* _stack;
-    sigjmp_buf _context;
+    sigjmp_buf _jmp_buf;
 };
-
-
-#endif //EX2_THREAD_H
