@@ -208,6 +208,7 @@ int uthread_get_total_quantums(){
     return _qCounter;
 }
 
+
 int uthread_spawn(void (*f)(void), int priority){
     //can't add
     if(_threads.size() != MAX_THREAD_NUM)
@@ -221,7 +222,7 @@ int uthread_spawn(void (*f)(void), int priority){
     }
     //printErrors
     return -1;
-}//8
+}
 
 int uthread_change_priority(int tid, int priority){
     if(!_threads.count(tid))
