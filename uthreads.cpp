@@ -64,7 +64,14 @@ static void printErrors(int type){
  * or -1 if there are no available free ids.
  */
 int nextId(){
-    return _threads.begin()->first; // since a map is sorted by keys
+    for(int i=0; i<100; i++)
+    {
+        if(!_threads.count(i))
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 
@@ -103,20 +110,6 @@ Thread* popReady(){
     return ret;
 }
 
-void runThread()
-{
-    Thread* tmp = popReady();
-    if(tmp != nullptr)
-    {
-        _running = tmp;
-    }
-    _running->setState(RUNNING);
-    _running->incQuantums();
-    _qCounter++;
-    startTimer();
-}
-
-
 
 
 int removeReady(int id){
@@ -150,26 +143,33 @@ void switchThreads()
     Thread *prev = _running;
     prev->setState(READY);
     Thread* next = popReady();
-    _running = next;
+    if(next != nullptr)
+    {
+        _running = next;
+    }
     _running->setState(RUNNING);
     _running->incQuantums();
     _qCounter++;
     startTimer();
-    pushReady(prev);
+    if(!_ready.empty())
+    {
+        pushReady(prev);;
+    }
+
 }
 
 
 static void timeHandler(int signum)
 {
-    flag = 1;
-    if(_running->getPriority()==1)
-    {
-        printf("Handler enter with SecondTh\n");
-    }
-    if(_running->getPriority()==0)
-    {
-        printf("Handler enter with FirstTh\n");
-    }
+//    flag = 1;
+//    if(_running->getPriority()==1)
+//    {
+//        printf("Handler enter with SecondTh\n");
+//    }
+//    if(_running->getPriority()==0)
+//    {
+//        printf("Handler enter with FirstTh\n");
+//    }
 
 
     bool timeOut = sigsetjmp(_running->getContext(),1) == 0;
@@ -271,19 +271,19 @@ int uthread_terminate(int tid){
         siglongjmp(_running->getContext(),1);
     }
 
-    if (_threads.at(tid)->getState() == READY) // in _ready list
+    if (_threads.at(tid)->getState() == READY)
     {
         removeReady(tid);
         _threads.erase(tid);
     }
-
-    if (_threads.at(tid)->getState() == BLOCK) // in _blocked list
+    else // Thread is in Block.
     {
         removeBlocked(tid);
         _threads.erase(tid);
     }
     return 0;
 }
+
 
 
 int uthread_get_tid()
@@ -308,6 +308,7 @@ int uthread_change_priority(int tid, int priority){
 
 
 int uthread_get_quantums(int tid){
+
     if (_threads.count(tid))
     {
         sigprocmask(SIG_BLOCK, &_sigAction.sa_mask, nullptr);
@@ -319,30 +320,66 @@ int uthread_get_quantums(int tid){
     return -1;
 }
 
-void f(){
-    while(1)
-    {
-        if(flag)
-        {
-            printf("hi\n");
-            flag =0;
-        }
-
-    }
-}
-int main()
+int uthread_block(int tid)
 {
-    int x[] = {3000000, 3000000, 3000000};
-    uthread_init(x, 3);
-    uthread_spawn(f,1);
-
-
-
-    while (1)
-    {
-
+    // Raise an error if the required id is zero or negative
+    // or the required id doe'nt exist
+    if (tid <= 0 || !_threads.count(tid)){
+        return -1;
     }
+    if (_threads[tid]->getState() == RUNNING){
+        Thread* next = popReady();
+        _running = next;
+        _running->setState(RUNNING);
+        _running->incQuantums();
+        _qCounter++;
+        startTimer();
+    }else if (_threads.at(tid)->getState() == READY){
+        popReady();
+    }
+    _threads[tid]->setState(BLOCK);
+    return 0;
 }
+
+int uthread_resume(int tid)
+{
+    if (tid <= 0 || !_threads.count(tid)){
+        return -1;
+    }
+    if (_threads[tid]->getState() == BLOCK)
+    {
+        pushReady(_threads.at(tid));
+        _threads[tid]->setState(READY);
+    }
+    return 0;
+}
+
+
+//
+//void f(){
+//    while(1)
+//    {
+//        if(flag)
+//        {
+//            printf("hi\n");
+//            flag =0;
+//        }
+//
+//    }
+//}
+//int main()
+//{
+//    int x[] = {3000000, 3000000, 3000000};
+//    uthread_init(x, 3);
+//    uthread_spawn(f,1);
+//
+//
+//
+//    while (1)
+//    {
+//
+//    }
+//}
 //1.get inside the handler after 3 secs with the mainTh(actually in an infinte loop)
 //2.right after it switches and get to f (almost same time)
 //3. after 3 secs in f (with a single print) go back to handler
@@ -351,4 +388,3 @@ int main()
 //> Handler enter with FirstTh
 //> hi
 //> Handler enter with SecondTh
-

@@ -48,10 +48,10 @@ RM = /usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -E remove
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /cs/usr/doronbruder/CLionProjects/ex2_os
+CMAKE_SOURCE_DIR = /cs/usr/doronbruder/CLionProjects/final
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /cs/usr/doronbruder/CLionProjects/ex2_os/cmake-build-debug
+CMAKE_BINARY_DIR = /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/ex2_os/cmake-build-debug/CMakeFiles /cs/usr/doronbruder/CLionProjects/ex2_os/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/ex2_os/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -122,6 +122,33 @@ ex2_os: cmake_check_build_system
 ex2_os/fast:
 	$(MAKE) -f CMakeFiles/ex2_os.dir/build.make CMakeFiles/ex2_os.dir/build
 .PHONY : ex2_os/fast
+
+Jona1.o: Jona1.cpp.o
+
+.PHONY : Jona1.o
+
+# target to build an object file
+Jona1.cpp.o:
+	$(MAKE) -f CMakeFiles/ex2_os.dir/build.make CMakeFiles/ex2_os.dir/Jona1.cpp.o
+.PHONY : Jona1.cpp.o
+
+Jona1.i: Jona1.cpp.i
+
+.PHONY : Jona1.i
+
+# target to preprocess a source file
+Jona1.cpp.i:
+	$(MAKE) -f CMakeFiles/ex2_os.dir/build.make CMakeFiles/ex2_os.dir/Jona1.cpp.i
+.PHONY : Jona1.cpp.i
+
+Jona1.s: Jona1.cpp.s
+
+.PHONY : Jona1.s
+
+# target to generate assembly for a file
+Jona1.cpp.s:
+	$(MAKE) -f CMakeFiles/ex2_os.dir/build.make CMakeFiles/ex2_os.dir/Jona1.cpp.s
+.PHONY : Jona1.cpp.s
 
 Thread.o: Thread.cpp.o
 
@@ -186,6 +213,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... ex2_os"
 	@echo "... edit_cache"
+	@echo "... Jona1.o"
+	@echo "... Jona1.i"
+	@echo "... Jona1.s"
 	@echo "... Thread.o"
 	@echo "... Thread.i"
 	@echo "... Thread.s"

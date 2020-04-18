@@ -3,4 +3,4 @@ project(ex2_os)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(ex2_os Thread.cpp Thread.h uthreads.h uthreads.cpp)
+add_executable(ex2_os Thread.cpp Thread.h uthreads.h uthreads.cpp Jona1.cpp)

@@ -4,8 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/cs/usr/doronbruder/CLionProjects/ex2_os/Thread.cpp" "/cs/usr/doronbruder/CLionProjects/ex2_os/cmake-build-debug/CMakeFiles/ex2_os.dir/Thread.cpp.o"
-  "/cs/usr/doronbruder/CLionProjects/ex2_os/uthreads.cpp" "/cs/usr/doronbruder/CLionProjects/ex2_os/cmake-build-debug/CMakeFiles/ex2_os.dir/uthreads.cpp.o"
+  "/cs/usr/doronbruder/CLionProjects/final/Jona1.cpp" "/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles/ex2_os.dir/Jona1.cpp.o"
+  "/cs/usr/doronbruder/CLionProjects/final/Thread.cpp" "/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles/ex2_os.dir/Thread.cpp.o"
+  "/cs/usr/doronbruder/CLionProjects/final/uthreads.cpp" "/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles/ex2_os.dir/uthreads.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

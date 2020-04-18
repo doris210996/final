@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/ex2_os.dir/Thread.cpp.o CMakeFiles/ex2_os.dir/uthreads.cpp.o  -o ex2_os 
+/usr/bin/c++  -g   CMakeFiles/ex2_os.dir/Thread.cpp.o CMakeFiles/ex2_os.dir/uthreads.cpp.o CMakeFiles/ex2_os.dir/Jona1.cpp.o  -o ex2_os 
