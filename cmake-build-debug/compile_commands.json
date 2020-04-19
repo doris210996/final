@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/tets",
+  "command": "/usr/bin/c++   -I/cs/usr/doronbruder/CLionProjects/final1/tets/.. -isystem /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/tets/googletest-src/googletest/include -isystem /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/tets/googletest-src/googletest  -g   -Wall -Wextra -std=gnu++11 -o CMakeFiles/theTests.dir/tests_to_be_ran_separately.cpp.o -c /cs/usr/doronbruder/CLionProjects/final1/tets/tests_to_be_ran_separately.cpp",
+  "file": "/cs/usr/doronbruder/CLionProjects/final1/tets/tests_to_be_ran_separately.cpp"
+}
+]
