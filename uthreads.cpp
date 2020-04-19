@@ -15,6 +15,9 @@
 #define MICRO_TO_SECOND 1000000
 #define TIME_OUT 0
 #define SET_TIME_ERROR 3
+#define CANT_BLOCK_MAIN 4
+#define NO_SUCH_TH_ID 5
+#define CANT_ADD_ABOVE_MAX 6
 #define ERROR_PREFIX "thread library error: "
 static std::vector<int> _quantums;
 static std::list<Thread*> _ready;
@@ -36,23 +39,36 @@ static void printErrors(int type){
     {
         case INVALID_QUANTUM_VAL:
         {
-            std::cerr << ERROR_PREFIX << "Invalid value for a quantum!";
+            std::cerr << ERROR_PREFIX << "Invalid value for a quantum!"<<std::endl;
         }
 
         case INVALID_PRIOR_NUM:
         {
-            std::cerr << ERROR_PREFIX << "Invalid value for priority amount!";
+            std::cerr << ERROR_PREFIX << "Invalid value for priority amount!"<<std::endl;
         }
 
         case SIGACTION_ERROR:
         {
-            std::cerr << ERROR_PREFIX << "Sigaction raised an unacceptable error!";
+            std::cerr << "system error: " << "Sigaction raised an unacceptable error!"<<std::endl;
         }
 
         case SET_TIME_ERROR:
         {
-            std::cerr << ERROR_PREFIX << "Set time error!";
+            std::cerr << "system error: " << "Set time error!"<<std::endl;
         }
+        case CANT_BLOCK_MAIN:
+        {
+            std::cerr << ERROR_PREFIX << "Cannot block the main!"<<std::endl;
+        }
+        case NO_SUCH_TH_ID:
+        {
+            std::cerr << ERROR_PREFIX << "Th of given id not exists!"<<std::endl;
+        }
+        case CANT_ADD_ABOVE_MAX:
+        {
+            std::cerr << ERROR_PREFIX << "Cannot add above max!"<<std::endl;
+        }
+            
         default:
             break;
     }
@@ -155,10 +171,7 @@ void switchThreads()
     _running->incQuantums();
     _qCounter++;
     startTimer();
-    if(!_ready.empty())
-    {
-        pushReady(prev);;
-    }
+    pushReady(prev);;
 
 }
 
@@ -248,7 +261,7 @@ int uthread_spawn(void (* f)(void), int pr)
     }
     else
     {
-        //printErrors
+        printErrors(6);
         return -1;
     }
 }
@@ -261,7 +274,7 @@ int uthread_terminate(int tid){
 
     if(!_threads.count(tid)) // not exist
     {
-        //printError
+        printErrors(5);
         return -1;
     }
 
@@ -301,7 +314,7 @@ int uthread_get_total_quantums()
 int uthread_change_priority(int tid, int priority){
     if(!_threads.count(tid))
     {
-        //printErrors
+        printErrors(5);
         return -1;
     }
     _threads[tid]->setPriority(priority);
@@ -318,7 +331,7 @@ int uthread_get_quantums(int tid){
         sigprocmask(SIG_UNBLOCK, &_sigAction.sa_mask, nullptr);
         return num;
     }
-    //printErrors
+    printErrors(5);
     return -1;
 }
 
@@ -331,12 +344,13 @@ int uthread_block(int tid)
 
     if (tid <= 0 || !_threads.count(tid))
     {
+        printErrors(4);
         return -1;
     }
 
     if (_threads[tid]->getState() == RUNNING){
         sigsetjmp(_running->getContext(),1);
-//        _threads[tid]->setState(BLOCK);
+        _threads[tid]->setState(BLOCK);
         Thread* next = popReady();
         _running = next;
         _running->setState(RUNNING);
@@ -345,8 +359,9 @@ int uthread_block(int tid)
         startTimer();
         siglongjmp(_running->getContext(),1);
     }else if (_threads.at(tid)->getState() == READY){
-        popReady();
         _threads[tid]->setState(BLOCK);
+        removeReady(tid);
+
 
     }
     return 0;
@@ -355,6 +370,7 @@ int uthread_block(int tid)
 int uthread_resume(int tid)
 {
     if (tid <= 0 || !_threads.count(tid)){
+        printErrors(5);
         return -1;
     }
     if (_threads[tid]->getState() == BLOCK)
