@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/cs/usr/doronbruder/CLionProjects/final/Thread.h
+/cs/usr/yehuda1033/CLionProjects/final/Thread.h
 stdio.h
 -
 setjmp.h
@@ -20,15 +20,15 @@ sys/time.h
 iostream
 -
 uthreads.h
-/cs/usr/doronbruder/CLionProjects/final/uthreads.h
+/cs/usr/yehuda1033/CLionProjects/final/uthreads.h
 
-/cs/usr/doronbruder/CLionProjects/final/uthreads.cpp
+/cs/usr/yehuda1033/CLionProjects/final/uthreads.cpp
 iostream
 -
 uthreads.h
-/cs/usr/doronbruder/CLionProjects/final/uthreads.h
+/cs/usr/yehuda1033/CLionProjects/final/uthreads.h
 Thread.h
-/cs/usr/doronbruder/CLionProjects/final/Thread.h
+/cs/usr/yehuda1033/CLionProjects/final/Thread.h
 queue
 -
 signal.h
@@ -46,5 +46,5 @@ algorithm
 list
 -
 
-/cs/usr/doronbruder/CLionProjects/final/uthreads.h
+/cs/usr/yehuda1033/CLionProjects/final/uthreads.h
 

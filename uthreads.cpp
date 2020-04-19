@@ -137,9 +137,13 @@ int removeBlocked(int id){
 
 }
 
-
+int count = 0;
 void switchThreads()
 {
+    count ++;
+    if (count == 10){
+        count = 10;
+    }
     Thread *prev = _running;
     prev->setState(READY);
     Thread* next = popReady();
@@ -161,17 +165,6 @@ void switchThreads()
 
 static void timeHandler(int signum)
 {
-//    flag = 1;
-//    if(_running->getPriority()==1)
-//    {
-//        printf("Handler enter with SecondTh\n");
-//    }
-//    if(_running->getPriority()==0)
-//    {
-//        printf("Handler enter with FirstTh\n");
-//    }
-
-
     bool timeOut = sigsetjmp(_running->getContext(),1) == 0;
     if (timeOut)
     {
@@ -282,6 +275,7 @@ int uthread_terminate(int tid){
         _threads.erase(tid);
     }
     return 0;
+
 }
 
 
@@ -324,16 +318,20 @@ int uthread_block(int tid)
 {
     // Raise an error if the required id is zero or negative
     // or the required id doe'nt exist
-    if (tid <= 0 || !_threads.count(tid)){
+    
+    if (tid <= 0 || !_threads.count(tid))
+    {
         return -1;
     }
     if (_threads[tid]->getState() == RUNNING){
+        sigsetjmp(_running->getContext(),1);
         Thread* next = popReady();
         _running = next;
         _running->setState(RUNNING);
         _running->incQuantums();
         _qCounter++;
         startTimer();
+        siglongjmp(_running->getContext(),1);
     }else if (_threads.at(tid)->getState() == READY){
         popReady();
     }
@@ -350,6 +348,7 @@ int uthread_resume(int tid)
     {
         pushReady(_threads.at(tid));
         _threads[tid]->setState(READY);
+        siglongjmp(_threads[tid]->getContext(),1);
     }
     return 0;
 }

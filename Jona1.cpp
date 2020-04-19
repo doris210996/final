@@ -36,7 +36,8 @@ void f (void)
             {
                 j++;
                 cout << "          f suspend by f" << endl;
-                uthread_block(uthread_get_tid());
+                int cur_tid = uthread_get_tid();
+                uthread_block(cur_tid);
             }
             if (i == 6 && j == 1)
             {
@@ -93,7 +94,8 @@ int main(void)
     {
         //int a = uthread_get_quantums(uthread_get_tid());
         //cout<<"quantums of thread number " << uthread_get_tid()<<" is " <<a<<std::endl;
-        if (i == uthread_get_quantums(uthread_get_tid()))
+        int cur_id  = uthread_get_tid();
+        if (i == uthread_get_quantums(cur_id))
         {
             cout << "m" << "  q:  " << i << endl;
             if (i == 3 && j == 0)

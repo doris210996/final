@@ -43,10 +43,10 @@ RM = /usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -E remove
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /cs/usr/doronbruder/CLionProjects/final
+CMAKE_SOURCE_DIR = /cs/usr/yehuda1033/CLionProjects/final
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug
+CMAKE_BINARY_DIR = /cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/ex2_os.dir/depend.make
@@ -59,42 +59,42 @@ include CMakeFiles/ex2_os.dir/flags.make
 
 CMakeFiles/ex2_os.dir/Thread.cpp.o: CMakeFiles/ex2_os.dir/flags.make
 CMakeFiles/ex2_os.dir/Thread.cpp.o: ../Thread.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ex2_os.dir/Thread.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2_os.dir/Thread.cpp.o -c /cs/usr/doronbruder/CLionProjects/final/Thread.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ex2_os.dir/Thread.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2_os.dir/Thread.cpp.o -c /cs/usr/yehuda1033/CLionProjects/final/Thread.cpp
 
 CMakeFiles/ex2_os.dir/Thread.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ex2_os.dir/Thread.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/doronbruder/CLionProjects/final/Thread.cpp > CMakeFiles/ex2_os.dir/Thread.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/yehuda1033/CLionProjects/final/Thread.cpp > CMakeFiles/ex2_os.dir/Thread.cpp.i
 
 CMakeFiles/ex2_os.dir/Thread.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ex2_os.dir/Thread.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/doronbruder/CLionProjects/final/Thread.cpp -o CMakeFiles/ex2_os.dir/Thread.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/yehuda1033/CLionProjects/final/Thread.cpp -o CMakeFiles/ex2_os.dir/Thread.cpp.s
 
 CMakeFiles/ex2_os.dir/uthreads.cpp.o: CMakeFiles/ex2_os.dir/flags.make
 CMakeFiles/ex2_os.dir/uthreads.cpp.o: ../uthreads.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ex2_os.dir/uthreads.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2_os.dir/uthreads.cpp.o -c /cs/usr/doronbruder/CLionProjects/final/uthreads.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ex2_os.dir/uthreads.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2_os.dir/uthreads.cpp.o -c /cs/usr/yehuda1033/CLionProjects/final/uthreads.cpp
 
 CMakeFiles/ex2_os.dir/uthreads.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ex2_os.dir/uthreads.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/doronbruder/CLionProjects/final/uthreads.cpp > CMakeFiles/ex2_os.dir/uthreads.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/yehuda1033/CLionProjects/final/uthreads.cpp > CMakeFiles/ex2_os.dir/uthreads.cpp.i
 
 CMakeFiles/ex2_os.dir/uthreads.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ex2_os.dir/uthreads.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/doronbruder/CLionProjects/final/uthreads.cpp -o CMakeFiles/ex2_os.dir/uthreads.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/yehuda1033/CLionProjects/final/uthreads.cpp -o CMakeFiles/ex2_os.dir/uthreads.cpp.s
 
 CMakeFiles/ex2_os.dir/Jona1.cpp.o: CMakeFiles/ex2_os.dir/flags.make
 CMakeFiles/ex2_os.dir/Jona1.cpp.o: ../Jona1.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ex2_os.dir/Jona1.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2_os.dir/Jona1.cpp.o -c /cs/usr/doronbruder/CLionProjects/final/Jona1.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ex2_os.dir/Jona1.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ex2_os.dir/Jona1.cpp.o -c /cs/usr/yehuda1033/CLionProjects/final/Jona1.cpp
 
 CMakeFiles/ex2_os.dir/Jona1.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ex2_os.dir/Jona1.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/doronbruder/CLionProjects/final/Jona1.cpp > CMakeFiles/ex2_os.dir/Jona1.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /cs/usr/yehuda1033/CLionProjects/final/Jona1.cpp > CMakeFiles/ex2_os.dir/Jona1.cpp.i
 
 CMakeFiles/ex2_os.dir/Jona1.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ex2_os.dir/Jona1.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/doronbruder/CLionProjects/final/Jona1.cpp -o CMakeFiles/ex2_os.dir/Jona1.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /cs/usr/yehuda1033/CLionProjects/final/Jona1.cpp -o CMakeFiles/ex2_os.dir/Jona1.cpp.s
 
 # Object files for target ex2_os
 ex2_os_OBJECTS = \
@@ -110,7 +110,7 @@ ex2_os: CMakeFiles/ex2_os.dir/uthreads.cpp.o
 ex2_os: CMakeFiles/ex2_os.dir/Jona1.cpp.o
 ex2_os: CMakeFiles/ex2_os.dir/build.make
 ex2_os: CMakeFiles/ex2_os.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable ex2_os"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable ex2_os"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ex2_os.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -123,6 +123,6 @@ CMakeFiles/ex2_os.dir/clean:
 .PHONY : CMakeFiles/ex2_os.dir/clean
 
 CMakeFiles/ex2_os.dir/depend:
-	cd /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /cs/usr/doronbruder/CLionProjects/final /cs/usr/doronbruder/CLionProjects/final /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug /cs/usr/doronbruder/CLionProjects/final/cmake-build-debug/CMakeFiles/ex2_os.dir/DependInfo.cmake --color=$(COLOR)
+	cd /cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /cs/usr/yehuda1033/CLionProjects/final /cs/usr/yehuda1033/CLionProjects/final /cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug /cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug /cs/usr/yehuda1033/CLionProjects/final/cmake-build-debug/CMakeFiles/ex2_os.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ex2_os.dir/depend
 
