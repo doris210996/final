@@ -162,6 +162,18 @@ void switchThreads()
 
 }
 
+void runThread()
+{
+    Thread* tmp = popReady();
+    if(tmp != nullptr)   //that's mean that not only one thread can run now!
+    {
+        _running = tmp;
+    }
+    _running->setState(RUNNING);
+    _running->incQuantums();
+    _qCounter++;
+    startTimer();
+}
 
 static void timeHandler(int signum)
 {
@@ -230,10 +242,6 @@ int uthread_spawn(void (* f)(void), int pr)
     {
         int tid = nextId();
         Thread *th = new Thread(tid, pr, f, READY);
-//        _timer.it_value.tv_sec = (int) (_quantums[pr] / MICRO_TO_SECOND);
-//        _timer.it_value.tv_usec = _quantums[pr] % MICRO_TO_SECOND;
-//        _timer.it_interval.tv_sec = (int) (_quantums[pr] / MICRO_TO_SECOND);
-//        _timer.it_interval.tv_usec = _quantums[pr] % MICRO_TO_SECOND;
         _threads.insert(std::pair<int, Thread *>(tid, th));
         pushReady(th);
         return tid;
@@ -318,13 +326,17 @@ int uthread_block(int tid)
 {
     // Raise an error if the required id is zero or negative
     // or the required id doe'nt exist
-    
+
+    //
+
     if (tid <= 0 || !_threads.count(tid))
     {
         return -1;
     }
+
     if (_threads[tid]->getState() == RUNNING){
         sigsetjmp(_running->getContext(),1);
+//        _threads[tid]->setState(BLOCK);
         Thread* next = popReady();
         _running = next;
         _running->setState(RUNNING);
@@ -334,8 +346,9 @@ int uthread_block(int tid)
         siglongjmp(_running->getContext(),1);
     }else if (_threads.at(tid)->getState() == READY){
         popReady();
+        _threads[tid]->setState(BLOCK);
+
     }
-    _threads[tid]->setState(BLOCK);
     return 0;
 }
 
@@ -348,7 +361,6 @@ int uthread_resume(int tid)
     {
         pushReady(_threads.at(tid));
         _threads[tid]->setState(READY);
-        siglongjmp(_threads[tid]->getContext(),1);
     }
     return 0;
 }
