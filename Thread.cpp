@@ -1,3 +1,4 @@
+
 #include "Thread.h"
 #define JUMP_VAL 1
 
@@ -48,7 +49,7 @@ address_t translate_address(address_t addr)
 sigjmp_buf env[3];
 
 Thread::Thread(int tid, int pr, void (*f)(void), State state): _tid(tid), _pr(pr), _f(f), _state
-(state)
+        (state)
 {
     _soFarQSycels = 0;
     _stack = new char[STACK_SIZE];
@@ -105,5 +106,3 @@ sigjmp_buf& Thread::getContext()
 {
     return _jmp_buf;
 }
-
-

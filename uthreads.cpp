@@ -68,7 +68,7 @@ static void printErrors(int type){
         {
             std::cerr << ERROR_PREFIX << "Cannot add above max!"<<std::endl;
         }
-            
+
         default:
             break;
     }
@@ -171,14 +171,17 @@ void switchThreads()
     _running->incQuantums();
     _qCounter++;
     startTimer();
-    pushReady(prev);;
+    if(_ready.empty())
+    {
+        pushReady(prev);
+    }
 
 }
 
 void runThread()
 {
     Thread* tmp = popReady();
-    if(tmp != nullptr)   //that's mean that not only one thread can run now!
+    if(tmp != NULL)   //that's mean that not only one thread can run now!
     {
         _running = tmp;
     }
@@ -350,9 +353,13 @@ int uthread_block(int tid)
 
     if (_threads[tid]->getState() == RUNNING){
         sigsetjmp(_running->getContext(),1);
-        _threads[tid]->setState(BLOCK);
+        Thread* th = _threads[tid];
+        th->setState(BLOCK);
         Thread* next = popReady();
-        _running = next;
+        if(next!=nullptr)
+        {
+            _running = next;
+        }
         _running->setState(RUNNING);
         _running->incQuantums();
         _qCounter++;
@@ -366,6 +373,7 @@ int uthread_block(int tid)
     }
     return 0;
 }
+
 
 int uthread_resume(int tid)
 {
