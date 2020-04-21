@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/cs/usr/doronbruder/CLionProjects/final1/Thread.cpp
+Thread.h
+/cs/usr/doronbruder/CLionProjects/final1/Thread.h
+
 /cs/usr/doronbruder/CLionProjects/final1/Thread.h
 stdio.h
 -
@@ -23,21 +27,15 @@ uthreads.h
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.h
 
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.cpp
-iostream
--
 uthreads.h
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.h
 Thread.h
 /cs/usr/doronbruder/CLionProjects/final1/Thread.h
+vector
+-
 queue
 -
-signal.h
--
-sys/time.h
--
 stdlib.h
--
-cmath
 -
 map
 -

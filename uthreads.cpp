@@ -1,86 +1,51 @@
-#include <iostream>
 #include "uthreads.h"
 #include "Thread.h"
+#include <vector>
 #include <queue>
-#include <signal.h>
-#include <sys/time.h>
 #include <stdlib.h>
-#include <cmath>
 #include <map>
 #include <algorithm>
 #include <list>
-#define INVALID_QUANTUM_VAL 0
-#define INVALID_PRIOR_NUM 1
-#define SIGACTION_ERROR 2
+using namespace std;
+#define FAIL -1
+#define SUCCESS 0
+#define MAIN_THREAD 0
 #define MICRO_TO_SECOND 1000000
-#define TIME_OUT 0
-#define SET_TIME_ERROR 3
-#define CANT_BLOCK_MAIN 4
-#define NO_SUCH_TH_ID 5
-#define CANT_ADD_ABOVE_MAX 6
-#define ERROR_PREFIX "thread library error: "
+#define THREAD_ERROR "thread library error: "
+#define SYS_ERROR "system error: "
+static list<Thread*> ready;
+static Thread* running;
+static map<int, Thread*> _threads;
+static int _quantum_counter = 0;
+struct itimerval _timer;
+struct sigaction _sigAction;
 static std::vector<int> _quantums;
-static std::list<Thread*> _ready;
-static std::list<Thread*> _blocked;
-static std::map<int, Thread*> _threads;
-static Thread* _running;
-static int _priorityAmount;
-static struct sigaction _sigAction = {0};
-static int _qCounter;
-static struct itimerval _timer;
-int flag = 0;
+static int blockedCounter;
 
 
-
-
-
-static void printErrors(int type){
-    switch(type)
+void helper(){
+    cout<< "\n";
+    cout<<"ready queue:\n";
+    for(Thread* th: ready)
     {
-        case INVALID_QUANTUM_VAL:
-        {
-            std::cerr << ERROR_PREFIX << "Invalid value for a quantum!"<<std::endl;
-        }
-
-        case INVALID_PRIOR_NUM:
-        {
-            std::cerr << ERROR_PREFIX << "Invalid value for priority amount!"<<std::endl;
-        }
-
-        case SIGACTION_ERROR:
-        {
-            std::cerr << "system error: " << "Sigaction raised an unacceptable error!"<<std::endl;
-        }
-
-        case SET_TIME_ERROR:
-        {
-            std::cerr << "system error: " << "Set time error!"<<std::endl;
-        }
-        case CANT_BLOCK_MAIN:
-        {
-            std::cerr << ERROR_PREFIX << "Cannot block the main!"<<std::endl;
-        }
-        case NO_SUCH_TH_ID:
-        {
-            std::cerr << ERROR_PREFIX << "Th of given id not exists!"<<std::endl;
-        }
-        case CANT_ADD_ABOVE_MAX:
-        {
-            std::cerr << ERROR_PREFIX << "Cannot add above max!"<<std::endl;
-        }
-
-        default:
-            break;
+        cout<<th->getId()<<"\n";
     }
+
+    cout<<"all threads set:\n";
+    for (std::map<int, Thread*>::iterator it = _threads.begin(); it != _threads.end(); ++it)
+    {
+        cout<<it->first<<"\n";
+    }
+
+    cout<<"How many blocked:"<<blockedCounter<<"\n\n";
+
 }
 
 
-/*
- * This function finds & returns the next smallest nonnegative integer not already taken by an existing thread,
- * or -1 if there are no available free ids.
- */
+
+
 int nextId(){
-    for(int i=0; i<100; i++)
+    for(int i=0; i<MAX_THREADS; i++)
     {
         if(!_threads.count(i))
         {
@@ -97,107 +62,81 @@ void pushReady(Thread* th)
     {
         return;
     }
-    _ready.push_back(th);
+
+    ready.push_back(th);
 }
 
-
-
-static void startTimer()
-{
-    _timer.it_value.tv_sec = (int) (_quantums[_running->getPriority()] / MICRO_TO_SECOND);
-    _timer.it_value.tv_usec = _quantums[_running->getPriority()] % MICRO_TO_SECOND;
-    _timer.it_interval.tv_sec = (int) (_quantums[_running->getPriority()] / MICRO_TO_SECOND);
-    _timer.it_interval.tv_usec = _quantums[_running->getPriority()] % MICRO_TO_SECOND;
-    if (setitimer(ITIMER_VIRTUAL, &_timer, NULL) == -1)
-    {
-        printErrors(SET_TIME_ERROR);
-        exit(1);
-    }
-
-}
 
 Thread* popReady(){
-    if(_ready.empty())
+    if(ready.empty())
     {
         return nullptr;
     }
-    Thread* ret = _ready.front();
-    _ready.pop_front();
+    Thread* ret = ready.front();
+    ready.pop_front();
     return ret;
 }
 
+static void setTime()
+{
+    _timer.it_value.tv_sec = (int) (_quantums[running->getPriority()] / MICRO_TO_SECOND);
+    _timer.it_value.tv_usec = _quantums[running->getPriority()] % MICRO_TO_SECOND;
+    _timer.it_interval.tv_sec = (int) (_quantums[running->getPriority()] / MICRO_TO_SECOND);
+    _timer.it_interval.tv_usec = _quantums[running->getPriority()] % MICRO_TO_SECOND;
+    if (setitimer(ITIMER_VIRTUAL, &_timer, NULL) == FAIL)
+    {
+        exit(1);
+    }
+}
 
 
-int removeReady(int id){
-    for(Thread* th: _ready)
+int removeFromReady(int id){
+    for(Thread* th: ready)
     {
         if(th->getId()==id)
         {
-            _ready.remove(_threads.at(id));
+            ready.remove(_threads.at(id));
             return 0;
         }
     }
     return -1;
 }
 
-int removeBlocked(int id){
-    for(Thread* th: _blocked)
-    {
-        if(th->getId()==id)
-        {
-            _blocked.remove(_threads.at(id));
-            return 0;
-        }
-    }
-    return -1;
 
-}
 
-int count = 0;
 void switchThreads()
 {
-    count ++;
-    if (count == 10){
-        count = 10;
+    cout<<"swich:\n";
+    for(Thread* th:ready)
+    {
+        cout<<th->getId()<<"\n";
     }
-    Thread *prev = _running;
+
+    Thread *prev = running;
     prev->setState(READY);
     Thread* next = popReady();
     if(next != nullptr)
     {
-        _running = next;
+        running = next;
     }
-    _running->setState(RUNNING);
-    _running->incQuantums();
-    _qCounter++;
-    startTimer();
-    if(_ready.empty())
+    running->setState(RUNNING);
+    running->incQuantums();
+    _quantum_counter++;
+    setTime();
+    if ((int) _threads.size() - 1 == blockedCounter)
     {
-        pushReady(prev);
+        return;
     }
-
-}
-
-void runThread()
-{
-    Thread* tmp = popReady();
-    if(tmp != NULL)   //that's mean that not only one thread can run now!
-    {
-        _running = tmp;
-    }
-    _running->setState(RUNNING);
-    _running->incQuantums();
-    _qCounter++;
-    startTimer();
+    pushReady(prev);
 }
 
 static void timeHandler(int signum)
 {
-    bool timeOut = sigsetjmp(_running->getContext(),1) == 0;
+    bool timeOut = sigsetjmp(running->getContext(),1) == 0;
     if (timeOut)
     {
         switchThreads();
-        siglongjmp(_running->getContext(),1);
+        siglongjmp(running->getContext(),1);
     }
 }
 
@@ -208,218 +147,249 @@ int uthread_init(int *quantum_usecs,int size)
 {
     if (size <= 0)
     {
-        printErrors(INVALID_PRIOR_NUM);
         return -1;
     }
-
     for(int i=0; i<size; i++)
     {
         if(quantum_usecs[i]<=0)
         {
-            printErrors(INVALID_QUANTUM_VAL);
             return -1;
         }
     }
-
-    //initialize sigaction
     _sigAction.sa_handler = timeHandler;
-
-    if(sigaction(SIGVTALRM,&_sigAction,NULL) < 0)
+    if(sigemptyset (&_sigAction.sa_mask) == FAIL)
     {
-        printErrors(SIGACTION_ERROR);
         exit(1);
     }
-
+    if(sigaddset(&_sigAction.sa_mask, SIGVTALRM))
+    {
+        exit(1);
+    }
+    _sigAction.sa_flags = 0;
+    if(sigaction(SIGVTALRM,&_sigAction,NULL) == FAIL)
+    {
+        exit(1);
+    }
     _quantums = std::vector<int> (quantum_usecs, quantum_usecs + size);
     std::sort(_quantums.rbegin(), _quantums.rend()); // reversed order, From now we will refer to
     // priority kth quantum
     // as the value of the kth index (when priority 0 which considered highest -has the longest
     // time)
-
-    //initialize timer
-    _timer.it_value.tv_sec = (int)(_quantums[0]/MICRO_TO_SECOND);
-    _timer.it_value.tv_usec = _quantums[0] % MICRO_TO_SECOND;
-    _timer.it_interval.tv_sec = (int)(_quantums[0]/MICRO_TO_SECOND);
-    _timer.it_interval.tv_usec = _quantums[0] % MICRO_TO_SECOND;
-
-    Thread* mainTh = new Thread(0,0, nullptr, READY);
-    _threads.insert(std::pair<int, Thread*>(0, mainTh));
-    _running = mainTh;
+    _timer.it_value.tv_sec = (int)(size/MICRO_TO_SECOND);
+    _timer.it_value.tv_usec = size % MICRO_TO_SECOND;
+    _timer.it_interval.tv_sec = (int)(size/MICRO_TO_SECOND);
+    _timer.it_interval.tv_usec = size % MICRO_TO_SECOND;
+    auto* mainTh = new Thread(0, 0, nullptr, READY);
+    _threads.insert(pair<int, Thread*>(0, mainTh));
+    running = mainTh;
     mainTh->setState(RUNNING);
     mainTh->incQuantums();
-    _qCounter++;
-    startTimer();
-    return 0;
+    _quantum_counter++;
+    setTime();
+    return SUCCESS;
 }
 
 int uthread_spawn(void (* f)(void), int pr)
 {
-    if (_threads.size() < 100)
+    //can't add any more!!
+    if(_threads.size() == 100)
     {
-        int tid = nextId();
-        Thread *th = new Thread(tid, pr, f, READY);
-        _threads.insert(std::pair<int, Thread *>(tid, th));
-        pushReady(th);
-        return tid;
+        return FAIL;
+    }
+
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
+
+    int tid = nextId();
+    auto* th = new Thread(tid, pr, f, READY);
+    _threads.insert(pair<int, Thread*>(tid, th));
+    if (running == NULL)  //for the first running (the main thread)
+    {
+        Thread* tmp = popReady();
+        if(tmp != nullptr)   //that's mean that not only one thread can run now!
+        {
+            running = tmp;
+        }
+        running->setState(RUNNING);
+        running->incQuantums();
+        _quantum_counter++;
+        setTime();;
     }
     else
     {
-        printErrors(6);
-        return -1;
+        pushReady(th);
     }
+    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
+    return tid;
 }
 
-int uthread_terminate(int tid){
-    if(tid == 0) // The main th
+
+int uthread_terminate(int tid)
+{
+    if (tid == MAIN_THREAD)
     {
+        _threads.clear();
         exit(0);
     }
-
-    if(!_threads.count(tid)) // not exist
+    if (!_threads.count(tid))
     {
-        printErrors(5);
-        return -1;
+        return FAIL;
     }
-
-    if (tid == _running->getId())
+    if (tid == running->getId())
     {
-        _threads.erase(tid);
+        Thread* temp = running;
         switchThreads();
-        siglongjmp(_running->getContext(),1);
+        removeFromReady(tid);
+        blockedCounter--;
+        _threads.erase(temp->getId());
+        siglongjmp(running->getContext(),1);
     }
-
     if (_threads.at(tid)->getState() == READY)
     {
-        removeReady(tid);
+        removeFromReady(tid);
         _threads.erase(tid);
     }
-    else // Thread is in Block.
+    else
     {
-        removeBlocked(tid);
+        blockedCounter--;
         _threads.erase(tid);
     }
-    return 0;
-
-}
-
-
-
-int uthread_get_tid()
-{
-    return _running->getId();
-}
-
-int uthread_get_total_quantums()
-{
-    return _qCounter;
-}
-
-int uthread_change_priority(int tid, int priority){
-    if(!_threads.count(tid))
-    {
-        printErrors(5);
-        return -1;
-    }
-    _threads[tid]->setPriority(priority);
-    return 0;
-}
-
-
-int uthread_get_quantums(int tid){
-
-    if (_threads.count(tid))
-    {
-        sigprocmask(SIG_BLOCK, &_sigAction.sa_mask, nullptr);
-        int num = _threads.at(tid)->getQuantumsAmount();
-        sigprocmask(SIG_UNBLOCK, &_sigAction.sa_mask, nullptr);
-        return num;
-    }
-    printErrors(5);
-    return -1;
+    return SUCCESS;
 }
 
 int uthread_block(int tid)
 {
-    // Raise an error if the required id is zero or negative
-    // or the required id doe'nt exist
-
-    //
-
-    if (tid <= 0 || !_threads.count(tid))
+    if (tid == MAIN_THREAD)
     {
-        printErrors(4);
-        return -1;
+        return FAIL;
     }
-
-    if (_threads[tid]->getState() == RUNNING){
-        sigsetjmp(_running->getContext(),1);
-        Thread* th = _threads[tid];
-        th->setState(BLOCK);
-        Thread* next = popReady();
-        if(next!=nullptr)
+    if (!_threads.count(tid))
+    {
+        return FAIL;
+    }
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
+    if (tid == running->getId())
+    {
+        sigsetjmp(running->getContext(),1);
+        running->setState(BLOCK);
+        blockedCounter++;
+        running = nullptr;
+        Thread* tmp = popReady();
+        if(tmp != nullptr)
         {
-            _running = next;
+            running = tmp;
         }
-        _running->setState(RUNNING);
-        _running->incQuantums();
-        _qCounter++;
-        startTimer();
-        siglongjmp(_running->getContext(),1);
-    }else if (_threads.at(tid)->getState() == READY){
-        _threads[tid]->setState(BLOCK);
-        removeReady(tid);
-
-
+        running->setState(RUNNING);
+        running->incQuantums();
+        _quantum_counter++;
+        setTime();
+        siglongjmp(running->getContext(),1);
     }
-    return 0;
+    if(removeFromReady(_threads[tid]->getId()) == FAIL)
+    {
+        return FAIL;
+    }
+    _threads[tid]->setState(BLOCK);
+    blockedCounter++;
+    return SUCCESS;
 }
 
 
 int uthread_resume(int tid)
 {
-    if (tid <= 0 || !_threads.count(tid)){
-        printErrors(5);
+    if(!_threads.count(tid))
+    {
+        return FAIL;
+    }
+    if(_threads.at(tid)->getState()==BLOCK)
+    {
+        _threads.at(tid)->setState(READY);
+        pushReady(_threads.at(tid));
+        blockedCounter--;
+        return SUCCESS;
+    }
+    else
+    {
+        return SUCCESS;
+    }
+}
+
+int uthread_get_tid()
+{
+    return running->getId();
+}
+
+int uthread_get_total_quantums()
+{
+    return _quantum_counter;
+}
+
+int uthread_change_priority(int tid, int priority){
+    if(!_threads.count(tid))
+    {
         return -1;
     }
-    if (_threads[tid]->getState() == BLOCK)
-    {
-        pushReady(_threads.at(tid));
-        _threads[tid]->setState(READY);
-    }
+    _threads[tid]->setPriority(priority);
     return 0;
+}
+int uthread_get_quantums(int tid)
+{
+    int valToRet;
+    if (!_threads.count(tid))
+    {
+        valToRet = FAIL;
+    }
+    else
+    {
+        valToRet = _threads.at(tid)->getQuantumsAmount();
+    }
+    return valToRet;
+}
+
+void f(void) {
+    int i = 0;
+    while (1) {
+        ++i;
+        if (i % 100000000 == 0)
+        {
+            printf("in f (%d)\n", i);
+        }
+
+
+    }
 }
 
 
-//
-//void f(){
-//    while(1)
-//    {
-//        if(flag)
-//        {
-//            printf("hi\n");
-//            flag =0;
-//        }
-//
-//    }
-//}
-//int main()
-//{
-//    int x[] = {3000000, 3000000, 3000000};
-//    uthread_init(x, 3);
-//    uthread_spawn(f,1);
-//
-//
-//
-//    while (1)
-//    {
-//
-//    }
-//}
-//1.get inside the handler after 3 secs with the mainTh(actually in an infinte loop)
-//2.right after it switches and get to f (almost same time)
-//3. after 3 secs in f (with a single print) go back to handler
-//4. now we in the handler with the second handler switching to the first and the first stay in
-// the infinite loop for 3 secs and  we get the following pattern when first two lines same time:
-//> Handler enter with FirstTh
-//> hi
-//> Handler enter with SecondTh
+void g(void) {
+    int i = 0;
+    while (1) {
+        ++i;
+        if (i % 100000000 == 0) {
+            printf("in g (%d)\n", i);
+        }
+    }
+}
+
+void h(void) {
+    int i = 0;
+    while (1) {
+        ++i;
+        if (i % 100000000 == 0) {
+            printf("in h (%d)\n", i);
+        }
+    }
+}
+
+int main() {
+    int quan[8] = {99999, 900000, 800000, 100000 - 20000, 100000 - 30000, 100000 - 40000, 100000 - 50000,
+                   100000 - 60000};
+    uthread_init(quan, 8);
+    int i = 0;
+    printf("%d\n", uthread_spawn(&g, 1));
+            printf("%d\n", uthread_spawn(&h, 2));
+            printf("%d\n", uthread_spawn(&f, 1));
+        printf("in main");
+
+    while (true) {}
+
+
+}
