@@ -81,8 +81,6 @@ static void setTime()
 {
     _timer.it_value.tv_sec = (int) (_quantums[running->getPriority()] / MICRO_TO_SECOND);
     _timer.it_value.tv_usec = _quantums[running->getPriority()] % MICRO_TO_SECOND;
-    _timer.it_interval.tv_sec = (int) (_quantums[running->getPriority()] / MICRO_TO_SECOND);
-    _timer.it_interval.tv_usec = _quantums[running->getPriority()] % MICRO_TO_SECOND;
     if (setitimer(ITIMER_VIRTUAL, &_timer, NULL) == FAIL)
     {
         exit(1);
@@ -104,13 +102,15 @@ int removeFromReady(int id){
 
 
 
+
+
 void switchThreads()
 {
-    cout<<"swich:\n";
-    for(Thread* th:ready)
-    {
-        cout<<th->getId()<<"\n";
-    }
+//    cout<<"swich:\n";
+//    for(Thread* th:ready)
+//    {
+//        cout<<th->getId()<<"\n";
+//    }
 
     Thread *prev = running;
     prev->setState(READY);
@@ -177,8 +177,6 @@ int uthread_init(int *quantum_usecs,int size)
     // time)
     _timer.it_value.tv_sec = (int)(size/MICRO_TO_SECOND);
     _timer.it_value.tv_usec = size % MICRO_TO_SECOND;
-    _timer.it_interval.tv_sec = (int)(size/MICRO_TO_SECOND);
-    _timer.it_interval.tv_usec = size % MICRO_TO_SECOND;
     auto* mainTh = new Thread(0, 0, nullptr, READY);
     _threads.insert(pair<int, Thread*>(0, mainTh));
     running = mainTh;
@@ -349,14 +347,12 @@ void f(void) {
     int i = 0;
     while (1) {
         ++i;
-        if (i % 100000000 == 0)
-        {
+        if (i % 100000000 == 0) {
             printf("in f (%d)\n", i);
-        }
 
 
     }
-}
+}}
 
 
 void g(void) {
@@ -371,25 +367,26 @@ void g(void) {
 
 void h(void) {
     int i = 0;
-    while (1) {
+    while (1)
         ++i;
         if (i % 100000000 == 0) {
             printf("in h (%d)\n", i);
         }
     }
-}
+
 
 int main() {
-    int quan[8] = {99999, 900000, 800000, 100000 - 20000, 100000 - 30000, 100000 - 40000, 100000 - 50000,
-                   100000 - 60000};
-    uthread_init(quan, 8);
+    // It works properly when all have same quantum , but fails with different times
+    int quan[8] = {1000000,1000000,1000000};
+    uthread_init(quan, 3);
     int i = 0;
-    printf("%d\n", uthread_spawn(&g, 1));
-            printf("%d\n", uthread_spawn(&h, 2));
             printf("%d\n", uthread_spawn(&f, 1));
-        printf("in main");
+            printf("%d\n", uthread_spawn(&g, 2));
+            printf("%d\n", uthread_spawn(&h, 1));
+            printf("in main\n");
 
     while (true) {}
 
 
+    return 0;
 }
