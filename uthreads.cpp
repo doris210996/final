@@ -466,50 +466,50 @@ int uthread_get_quantums(int tid)
     sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
     return valToRet;
 }
-
-void f(void) {
-    int i = 0;
-    while (1) {
-        ++i;
-        if (i % 100000000 == 0) {
-            printf("in f (%d)\n", i);
-
-
-        }
-    }}
-
-
-void g(void) {
-    int i = 0;
-    while (1) {
-        ++i;
-        if (i % 100000000 == 0) {
-            printf("in g (%d)\n", i);
-        }
-    }
-}
-
-void h(void) {
-    int i = 0;
-    while (1){
-        ++i;
-    if (i % 100000000 == 0) {
-        printf("in h (%d)\n", i);
-    }
-}}
-
-
-int main() {
-    // It works properly when all have same quantum , but fails with different times
-    int quan[8] = {1000000,100000,1000000};
-    uthread_init(quan, 3);
-    int i = 0;
-    printf("%d\n", uthread_spawn(&f, 1));
-    printf("%d\n", uthread_spawn(&g, 2));
-    printf("%d\n", uthread_spawn(&h, 1));
-    printf("in main\n");
-
-    while (true) {}
-
-
-}
+//
+//void f(void) {
+//    int i = 0;
+//    while (1) {
+//        ++i;
+//        if (i % 100000000 == 0) {
+//            printf("in f (%d)\n", i);
+//
+//
+//        }
+//    }}
+//
+//
+//void g(void) {
+//    int i = 0;
+//    while (1) {
+//        ++i;
+//        if (i % 100000000 == 0) {
+//            printf("in g (%d)\n", i);
+//        }
+//    }
+//}
+//
+//void h(void) {
+//    int i = 0;
+//    while (1){
+//        ++i;
+//    if (i % 100000000 == 0) {
+//        printf("in h (%d)\n", i);
+//    }
+//}}
+//
+//
+//int main() {
+//    // It works properly when all have same quantum , but fails with different times
+//    int quan[8] = {1000000,100000,1000000};
+//    uthread_init(quan, 3);
+//    int i = 0;
+//    printf("%d\n", uthread_spawn(&f, 1));
+//    printf("%d\n", uthread_spawn(&g, 2));
+//    printf("%d\n", uthread_spawn(&h, 1));
+//    printf("in main\n");
+//
+//    while (true) {}
+//
+//
+//}

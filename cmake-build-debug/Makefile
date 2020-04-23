@@ -56,16 +56,17 @@ CMAKE_BINARY_DIR = /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
 
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -77,6 +78,51 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/APP/jetbrains/clion/2019.2.1/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -111,17 +157,82 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named uthreads.h
+# Target rules for targets named uthreads
 
 # Build rule for target.
-uthreads.h: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 uthreads.h
-.PHONY : uthreads.h
+uthreads: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 uthreads
+.PHONY : uthreads
 
 # fast build rule for target.
-uthreads.h/fast:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/build
-.PHONY : uthreads.h/fast
+uthreads/fast:
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/build
+.PHONY : uthreads/fast
+
+#=============================================================================
+# Target rules for targets named theTests
+
+# Build rule for target.
+theTests: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 theTests
+.PHONY : theTests
+
+# fast build rule for target.
+theTests/fast:
+	$(MAKE) -f tets/CMakeFiles/theTests.dir/build.make tets/CMakeFiles/theTests.dir/build
+.PHONY : theTests/fast
+
+#=============================================================================
+# Target rules for targets named gmock_main
+
+# Build rule for target.
+gmock_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gmock_main
+.PHONY : gmock_main
+
+# fast build rule for target.
+gmock_main/fast:
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build
+.PHONY : gmock_main/fast
+
+#=============================================================================
+# Target rules for targets named gmock
+
+# Build rule for target.
+gmock: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gmock
+.PHONY : gmock
+
+# fast build rule for target.
+gmock/fast:
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock.dir/build
+.PHONY : gmock/fast
+
+#=============================================================================
+# Target rules for targets named gtest_main
+
+# Build rule for target.
+gtest_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest_main
+.PHONY : gtest_main
+
+# fast build rule for target.
+gtest_main/fast:
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/build
+.PHONY : gtest_main/fast
+
+#=============================================================================
+# Target rules for targets named gtest
+
+# Build rule for target.
+gtest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest
+.PHONY : gtest
+
+# fast build rule for target.
+gtest/fast:
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest.dir/build
+.PHONY : gtest/fast
 
 Thread.o: Thread.cpp.o
 
@@ -129,7 +240,7 @@ Thread.o: Thread.cpp.o
 
 # target to build an object file
 Thread.cpp.o:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/Thread.cpp.o
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/Thread.cpp.o
 .PHONY : Thread.cpp.o
 
 Thread.i: Thread.cpp.i
@@ -138,7 +249,7 @@ Thread.i: Thread.cpp.i
 
 # target to preprocess a source file
 Thread.cpp.i:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/Thread.cpp.i
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/Thread.cpp.i
 .PHONY : Thread.cpp.i
 
 Thread.s: Thread.cpp.s
@@ -147,7 +258,7 @@ Thread.s: Thread.cpp.s
 
 # target to generate assembly for a file
 Thread.cpp.s:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/Thread.cpp.s
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/Thread.cpp.s
 .PHONY : Thread.cpp.s
 
 uthreads.o: uthreads.cpp.o
@@ -156,7 +267,7 @@ uthreads.o: uthreads.cpp.o
 
 # target to build an object file
 uthreads.cpp.o:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/uthreads.cpp.o
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/uthreads.cpp.o
 .PHONY : uthreads.cpp.o
 
 uthreads.i: uthreads.cpp.i
@@ -165,7 +276,7 @@ uthreads.i: uthreads.cpp.i
 
 # target to preprocess a source file
 uthreads.cpp.i:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/uthreads.cpp.i
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/uthreads.cpp.i
 .PHONY : uthreads.cpp.i
 
 uthreads.s: uthreads.cpp.s
@@ -174,7 +285,7 @@ uthreads.s: uthreads.cpp.s
 
 # target to generate assembly for a file
 uthreads.cpp.s:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/uthreads.cpp.s
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/uthreads.cpp.s
 .PHONY : uthreads.cpp.s
 
 # Help Target
@@ -183,9 +294,18 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... uthreads.h"
+	@echo "... install/strip"
 	@echo "... edit_cache"
+	@echo "... uthreads"
+	@echo "... install"
+	@echo "... rebuild_cache"
+	@echo "... list_install_components"
+	@echo "... install/local"
+	@echo "... theTests"
+	@echo "... gmock_main"
+	@echo "... gmock"
+	@echo "... gtest_main"
+	@echo "... gtest"
 	@echo "... Thread.o"
 	@echo "... Thread.i"
 	@echo "... Thread.s"

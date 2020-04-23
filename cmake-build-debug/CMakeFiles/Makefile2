@@ -65,39 +65,284 @@ CMAKE_SOURCE_DIR = /cs/usr/doronbruder/CLionProjects/final1
 CMAKE_BINARY_DIR = /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug
 
 #=============================================================================
-# Target rules for target CMakeFiles/uthreads.h.dir
+# Target rules for target CMakeFiles/uthreads.dir
 
 # All Build rule for target.
-CMakeFiles/uthreads.h.dir/all:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/depend
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=1,2,3 "Built target uthreads.h"
-.PHONY : CMakeFiles/uthreads.h.dir/all
+CMakeFiles/uthreads.dir/all:
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/depend
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=11,12,13 "Built target uthreads"
+.PHONY : CMakeFiles/uthreads.dir/all
 
 # Include target in all.
-all: CMakeFiles/uthreads.h.dir/all
+all: CMakeFiles/uthreads.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/uthreads.h.dir/rule: cmake_check_build_system
+CMakeFiles/uthreads.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 3
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/uthreads.h.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/uthreads.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/uthreads.h.dir/rule
+.PHONY : CMakeFiles/uthreads.dir/rule
 
 # Convenience name for target.
-uthreads.h: CMakeFiles/uthreads.h.dir/rule
+uthreads: CMakeFiles/uthreads.dir/rule
 
-.PHONY : uthreads.h
-
-# clean rule for target.
-CMakeFiles/uthreads.h.dir/clean:
-	$(MAKE) -f CMakeFiles/uthreads.h.dir/build.make CMakeFiles/uthreads.h.dir/clean
-.PHONY : CMakeFiles/uthreads.h.dir/clean
+.PHONY : uthreads
 
 # clean rule for target.
-clean: CMakeFiles/uthreads.h.dir/clean
+CMakeFiles/uthreads.dir/clean:
+	$(MAKE) -f CMakeFiles/uthreads.dir/build.make CMakeFiles/uthreads.dir/clean
+.PHONY : CMakeFiles/uthreads.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/uthreads.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory tets
+
+# Convenience name for "all" pass in the directory.
+tets/all: tets/CMakeFiles/theTests.dir/all
+tets/all: tets/googletest-build/all
+
+.PHONY : tets/all
+
+# Convenience name for "clean" pass in the directory.
+tets/clean: tets/CMakeFiles/theTests.dir/clean
+tets/clean: tets/googletest-build/clean
+
+.PHONY : tets/clean
+
+# Convenience name for "preinstall" pass in the directory.
+tets/preinstall: tets/googletest-build/preinstall
+
+.PHONY : tets/preinstall
+
+#=============================================================================
+# Target rules for target tets/CMakeFiles/theTests.dir
+
+# All Build rule for target.
+tets/CMakeFiles/theTests.dir/all: tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/all
+tets/CMakeFiles/theTests.dir/all: CMakeFiles/uthreads.dir/all
+tets/CMakeFiles/theTests.dir/all: tets/googletest-build/googletest/CMakeFiles/gtest.dir/all
+	$(MAKE) -f tets/CMakeFiles/theTests.dir/build.make tets/CMakeFiles/theTests.dir/depend
+	$(MAKE) -f tets/CMakeFiles/theTests.dir/build.make tets/CMakeFiles/theTests.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=9,10 "Built target theTests"
+.PHONY : tets/CMakeFiles/theTests.dir/all
+
+# Include target in all.
+all: tets/CMakeFiles/theTests.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+tets/CMakeFiles/theTests.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 9
+	$(MAKE) -f CMakeFiles/Makefile2 tets/CMakeFiles/theTests.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 0
+.PHONY : tets/CMakeFiles/theTests.dir/rule
+
+# Convenience name for target.
+theTests: tets/CMakeFiles/theTests.dir/rule
+
+.PHONY : theTests
+
+# clean rule for target.
+tets/CMakeFiles/theTests.dir/clean:
+	$(MAKE) -f tets/CMakeFiles/theTests.dir/build.make tets/CMakeFiles/theTests.dir/clean
+.PHONY : tets/CMakeFiles/theTests.dir/clean
+
+# clean rule for target.
+clean: tets/CMakeFiles/theTests.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory tets/googletest-build
+
+# Convenience name for "all" pass in the directory.
+tets/googletest-build/all: tets/googletest-build/googlemock/all
+
+.PHONY : tets/googletest-build/all
+
+# Convenience name for "clean" pass in the directory.
+tets/googletest-build/clean: tets/googletest-build/googlemock/clean
+
+.PHONY : tets/googletest-build/clean
+
+# Convenience name for "preinstall" pass in the directory.
+tets/googletest-build/preinstall: tets/googletest-build/googlemock/preinstall
+
+.PHONY : tets/googletest-build/preinstall
+
+#=============================================================================
+# Directory level rules for directory tets/googletest-build/googlemock
+
+# Convenience name for "all" pass in the directory.
+tets/googletest-build/googlemock/all: tets/googletest-build/googletest/all
+
+.PHONY : tets/googletest-build/googlemock/all
+
+# Convenience name for "clean" pass in the directory.
+tets/googletest-build/googlemock/clean: tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/clean
+tets/googletest-build/googlemock/clean: tets/googletest-build/googlemock/CMakeFiles/gmock.dir/clean
+tets/googletest-build/googlemock/clean: tets/googletest-build/googletest/clean
+
+.PHONY : tets/googletest-build/googlemock/clean
+
+# Convenience name for "preinstall" pass in the directory.
+tets/googletest-build/googlemock/preinstall: tets/googletest-build/googletest/preinstall
+
+.PHONY : tets/googletest-build/googlemock/preinstall
+
+#=============================================================================
+# Target rules for target tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir
+
+# All Build rule for target.
+tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all: tets/googletest-build/googlemock/CMakeFiles/gmock.dir/all
+tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all: tets/googletest-build/googletest/CMakeFiles/gtest.dir/all
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/depend
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=3,4 "Built target gmock_main"
+.PHONY : tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all
+
+# Build rule for subdir invocation for target.
+tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 6
+	$(MAKE) -f CMakeFiles/Makefile2 tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 0
+.PHONY : tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule
+
+# Convenience name for target.
+gmock_main: tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/rule
+
+.PHONY : gmock_main
+
+# clean rule for target.
+tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/clean:
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/clean
+.PHONY : tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/clean
+
+# clean rule for target.
+clean: tets/googletest-build/googlemock/CMakeFiles/gmock_main.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target tets/googletest-build/googlemock/CMakeFiles/gmock.dir
+
+# All Build rule for target.
+tets/googletest-build/googlemock/CMakeFiles/gmock.dir/all: tets/googletest-build/googletest/CMakeFiles/gtest.dir/all
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock.dir/depend
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target gmock"
+.PHONY : tets/googletest-build/googlemock/CMakeFiles/gmock.dir/all
+
+# Build rule for subdir invocation for target.
+tets/googletest-build/googlemock/CMakeFiles/gmock.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 tets/googletest-build/googlemock/CMakeFiles/gmock.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 0
+.PHONY : tets/googletest-build/googlemock/CMakeFiles/gmock.dir/rule
+
+# Convenience name for target.
+gmock: tets/googletest-build/googlemock/CMakeFiles/gmock.dir/rule
+
+.PHONY : gmock
+
+# clean rule for target.
+tets/googletest-build/googlemock/CMakeFiles/gmock.dir/clean:
+	$(MAKE) -f tets/googletest-build/googlemock/CMakeFiles/gmock.dir/build.make tets/googletest-build/googlemock/CMakeFiles/gmock.dir/clean
+.PHONY : tets/googletest-build/googlemock/CMakeFiles/gmock.dir/clean
+
+# clean rule for target.
+clean: tets/googletest-build/googlemock/CMakeFiles/gmock.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory tets/googletest-build/googletest
+
+# Convenience name for "all" pass in the directory.
+tets/googletest-build/googletest/all:
+
+.PHONY : tets/googletest-build/googletest/all
+
+# Convenience name for "clean" pass in the directory.
+tets/googletest-build/googletest/clean: tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/clean
+tets/googletest-build/googletest/clean: tets/googletest-build/googletest/CMakeFiles/gtest.dir/clean
+
+.PHONY : tets/googletest-build/googletest/clean
+
+# Convenience name for "preinstall" pass in the directory.
+tets/googletest-build/googletest/preinstall:
+
+.PHONY : tets/googletest-build/googletest/preinstall
+
+#=============================================================================
+# Target rules for target tets/googletest-build/googletest/CMakeFiles/gtest_main.dir
+
+# All Build rule for target.
+tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/all: tets/googletest-build/googletest/CMakeFiles/gtest.dir/all
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/depend
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=7,8 "Built target gtest_main"
+.PHONY : tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/all
+
+# Build rule for subdir invocation for target.
+tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 0
+.PHONY : tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/rule
+
+# Convenience name for target.
+gtest_main: tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/rule
+
+.PHONY : gtest_main
+
+# clean rule for target.
+tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/clean:
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/clean
+.PHONY : tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/clean
+
+# clean rule for target.
+clean: tets/googletest-build/googletest/CMakeFiles/gtest_main.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target tets/googletest-build/googletest/CMakeFiles/gtest.dir
+
+# All Build rule for target.
+tets/googletest-build/googletest/CMakeFiles/gtest.dir/all:
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest.dir/depend
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles --progress-num=5,6 "Built target gtest"
+.PHONY : tets/googletest-build/googletest/CMakeFiles/gtest.dir/all
+
+# Build rule for subdir invocation for target.
+tets/googletest-build/googletest/CMakeFiles/gtest.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 tets/googletest-build/googletest/CMakeFiles/gtest.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /cs/usr/doronbruder/CLionProjects/final1/cmake-build-debug/CMakeFiles 0
+.PHONY : tets/googletest-build/googletest/CMakeFiles/gtest.dir/rule
+
+# Convenience name for target.
+gtest: tets/googletest-build/googletest/CMakeFiles/gtest.dir/rule
+
+.PHONY : gtest
+
+# clean rule for target.
+tets/googletest-build/googletest/CMakeFiles/gtest.dir/clean:
+	$(MAKE) -f tets/googletest-build/googletest/CMakeFiles/gtest.dir/build.make tets/googletest-build/googletest/CMakeFiles/gtest.dir/clean
+.PHONY : tets/googletest-build/googletest/CMakeFiles/gtest.dir/clean
+
+# clean rule for target.
+clean: tets/googletest-build/googletest/CMakeFiles/gtest.dir/clean
 
 .PHONY : clean
 
