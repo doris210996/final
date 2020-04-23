@@ -15,7 +15,7 @@
 #define HIGHEST_PRIORITY 0
 
 #define MAX_THREADS 100
-void helper();
+//void helper();
 /*
  * Description: This function initializes the thread library.
  * You may assume that this function is called before any other thread library

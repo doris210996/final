@@ -6,10 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/cs/usr/doronbruder/CLionProjects/final1/Thread.cpp
-Thread.h
-/cs/usr/doronbruder/CLionProjects/final1/Thread.h
-
 /cs/usr/doronbruder/CLionProjects/final1/Thread.h
 stdio.h
 -
@@ -40,8 +36,6 @@ stdlib.h
 map
 -
 algorithm
--
-list
 -
 
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.h
