@@ -473,10 +473,10 @@ int uthread_get_quantums(int tid)
 //        ++i;
 //        if (i % 100000000 == 0) {
 //            printf("in f (%d)\n", i);
-//
-//
 //        }
-//    }}
+//
+//    }
+//}
 //
 //
 //void g(void) {
@@ -491,25 +491,32 @@ int uthread_get_quantums(int tid)
 //
 //void h(void) {
 //    int i = 0;
-//    while (1){
+//    while (1) {
 //        ++i;
-//    if (i % 100000000 == 0) {
-//        printf("in h (%d)\n", i);
+//        if (i % 100000000 == 0) {
+//            printf("in h (%d)\n", i);
+//        }
 //    }
-//}}
-//
+//}
 //
 //int main() {
-//    // It works properly when all have same quantum , but fails with different times
-//    int quan[8] = {1000000,100000,1000000};
-//    uthread_init(quan, 3);
+//    int quan[8] = {99999, 900000, 800000, 100000 - 20000, 100000 - 30000, 100000 - 40000, 100000 - 50000,
+//                   100000 - 60000};
+//    uthread_init(quan, 8);
 //    int i = 0;
-//    printf("%d\n", uthread_spawn(&f, 1));
-//    printf("%d\n", uthread_spawn(&g, 2));
-//    printf("%d\n", uthread_spawn(&h, 1));
-//    printf("in main\n");
-//
+//    while (1) {
+//        if (i % 3 == 0) {
+//            printf("%d\n", uthread_spawn(&f, 1));
+//        } else if (i % 3 == 1) {
+//            printf("%d\n", uthread_spawn(&g, 2));
+//        } else {
+//            printf("%d\n", uthread_spawn(&h, 1));
+//        }
+//        printf("in main");
+//        ++i;
+//    }
 //    while (true) {}
 //
 //
+//    return 0;
 //}
