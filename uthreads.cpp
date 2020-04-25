@@ -5,13 +5,7 @@
 #include <stdlib.h>
 #include <map>
 #include <algorithm>
-
 using namespace std;
-
-#define NUM_OF_QUEUE 3
-#define RED_Q 0
-#define ORANGE_Q 1
-#define GREEN_Q 2
 #define FAIL -1
 #define SUCCESS 0
 #define MAIN_THREAD 0
@@ -24,7 +18,6 @@ using namespace std;
 #define WRONG_INPUT 3
 #define SIGNAL_ACTION_ERROR 4
 #define TOO_MANY_THREADS 5
-
 static vector<Thread*> ready; // An array of size 3 of queues, which each represents a queue of priority.
 static vector<Thread*> blocked; // The "Blocked" vector, which represents a queue of threads.
 static Thread* running; // The "Running" thread.
@@ -224,7 +217,7 @@ void switchThreads()
     // if there are x threads in _threads and x + 1 threads in blocked, than it means that there is nothing
     // in ready, so the current running thread should not get into ready and keep running.
 
-        addToReady(tmp);
+    addToReady(tmp);
 }
 
 /**
@@ -381,21 +374,26 @@ int uthread_block(int tid)
     sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
     if (tid == running->getId())
     {
-        sigsetjmp(running->getContext(),1);
-        running->setState(BLOCK);
-        blocked.push_back(running);
-        running = nullptr;
-        runThread();
-        siglongjmp(running->getContext(),1);
+        if(sigsetjmp(running->getContext(),1) != 0)
+        {
+        }
+        else
+        {
+            running->setState(BLOCK);
+            blocked.push_back(running);
+            runThread();
+            siglongjmp(running->getContext(), 1);
+        }
     }
     else
     {
         if(removeFromReady(_threads[tid]->getId()) == FAIL)  // Exists, not in ready and not running - in blocked.
         {
             sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
-            return FAIL;
+            return 0;
         }
         // Was in Ready
+        removeFromReady(tid);
         _threads[tid]->setState(BLOCK);
         blocked.push_back(_threads[tid]);
     }
@@ -408,24 +406,25 @@ int uthread_resume(int tid)
 {
     if(!_threads.count(tid))
     {
-        printError(NOT_FOUND_ID, THREAD_ERROR);
         return FAIL;
+    }
+    if(_threads[tid]->getState()==RUNNING)
+    {
+        return 0;
     }
     //if not in block, don't resume
     if(find(blocked.begin(), blocked.end(), _threads[tid]) != blocked.end())
     {
         sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
-        int pos = find(blocked.begin(), blocked.end(), _threads[tid]) - blocked.begin();
-        Thread* th = blocked.at((unsigned int) pos);
-        th->setState(READY);
-        addToReady(th);
+        _threads[tid]->setState(READY);
+        addToReady(_threads[tid]);
         removeFromBlock(tid);
         sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
         return SUCCESS;
     }
     else
     {
-        return FAIL;
+        return SUCCESS;
     }
 }
 int uthread_change_priority(int tid, int priority){
@@ -468,11 +467,17 @@ int uthread_get_quantums(int tid)
 }
 //
 //void f(void) {
+////    uthread_block(1);
+//
 //    int i = 0;
 //    while (1) {
 //        ++i;
+//
 //        if (i % 100000000 == 0) {
+//
 //            printf("in f (%d)\n", i);
+//
+//
 //        }
 //
 //    }
@@ -481,20 +486,28 @@ int uthread_get_quantums(int tid)
 //
 //void g(void) {
 //    int i = 0;
+//
 //    while (1) {
+//
 //        ++i;
 //        if (i % 100000000 == 0) {
 //            printf("in g (%d)\n", i);
+//
 //        }
+//
 //    }
 //}
 //
 //void h(void) {
+////    uthread_resume(1);
+//
 //    int i = 0;
 //    while (1) {
 //        ++i;
 //        if (i % 100000000 == 0) {
 //            printf("in h (%d)\n", i);
+//
+//
 //        }
 //    }
 //}
@@ -504,18 +517,20 @@ int uthread_get_quantums(int tid)
 //                   100000 - 60000};
 //    uthread_init(quan, 8);
 //    int i = 0;
-//    while (1) {
-//        if (i % 3 == 0) {
+////    while (1) {
+////        if (i % 3 == 0) {
 //            printf("%d\n", uthread_spawn(&f, 1));
-//        } else if (i % 3 == 1) {
+////        } else if (i % 3 == 1) {
 //            printf("%d\n", uthread_spawn(&g, 2));
-//        } else {
+////        } else {
 //            printf("%d\n", uthread_spawn(&h, 1));
-//        }
+////        }
+////        uthread_block(2);
 //        printf("in main");
 //        ++i;
+////    }
+//    while (true) {
 //    }
-//    while (true) {}
 //
 //
 //    return 0;
