@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cs/usr/doronbruder/CLionProjects/final1/Thread.h
+stdio.h
+-
+setjmp.h
+-
+signal.h
+-
+unistd.h
+-
+sys/time.h
+-
+iostream
+-
+uthreads.h
+/cs/usr/doronbruder/CLionProjects/final1/uthreads.h
+
+/cs/usr/doronbruder/CLionProjects/final1/uthreads.cpp
+uthreads.h
+/cs/usr/doronbruder/CLionProjects/final1/uthreads.h
+Thread.h
+/cs/usr/doronbruder/CLionProjects/final1/Thread.h
+vector
+-
+queue
+-
+stdlib.h
+-
+map
+-
+algorithm
+-
+
+/cs/usr/doronbruder/CLionProjects/final1/uthreads.h
+

@@ -1,10 +1,8 @@
-#include "uthreads.h"
 #include "Thread.h"
 #include <vector>
-#include <queue>
+#include <list>
 #include <stdlib.h>
 #include <map>
-#include <algorithm>
 using namespace std;
 #define FAIL -1
 #define SUCCESS 0
@@ -18,19 +16,16 @@ using namespace std;
 #define WRONG_INPUT 3
 #define SIGNAL_ACTION_ERROR 4
 #define TOO_MANY_THREADS 5
-static vector<Thread*> ready; // An array of size 3 of queues, which each represents a queue of priority.
-static vector<Thread*> blocked; // The "Blocked" vector, which represents a queue of threads.
+static int blockedCounter;
+static list<Thread*> ready;
 static Thread* running; // The "Running" thread.
-static map<int, Thread*> _threads; // All threads together
+static map<int, Thread*> _threads;
 static int _quantum_counter = 0;
 struct itimerval _timer;
 struct sigaction _sigAction;
 int* sig;
 static vector<int> quantums;
 
-
-int removeFromReady(int tid);
-Thread* popReady();
 
 /**
  * function responsable for printing each kind of error
@@ -75,41 +70,31 @@ void printError(int type, string pre)
 }
 
 
-/*
- * This function finds & returns the next smallest nonnegative integer not already taken by an existing thread,
- * or -1 if there are no available free ids.
- */
-int getNextId()
+int nextId()
 {
-    int idToReturn = 0;
-    for (map<int, Thread*>::iterator iter = _threads.begin(); iter != _threads.end();
-         idToReturn++, iter++)
+    for(int i =0; i <100; i++)
     {
-        if (iter->first != idToReturn)
+        if(!_threads.count(i))
         {
-            break;
+            return i;
         }
     }
-    return idToReturn;
+    return -1;
 }
 
-/**
- * add thread to the requsted ready queue
- */
-void addToReady(Thread* th)
+
+void addReady(Thread* th)
 {
     if(th == nullptr)
     {
         return;
     }
-    ready.insert(ready.end(), th);
+    ready.push_back(th);
 
 }
 
 
-/**
- * set time and check if set is done correctly
- */
+
 static void setTime()
 {
     _timer.it_value.tv_sec = (int)(quantums[running->getPriority()]/MICRO_TO_SECOND);
@@ -121,111 +106,62 @@ static void setTime()
     }
 }
 
-/**
- * runs the given thread.
- */
-void runThread()
-{
-    Thread* tmp = popReady();
-    if(tmp != nullptr)   //that's mean that not only one thread can run now!
+
+
+Thread* popReady(){
+    if(ready.empty())
     {
-        running = tmp;
+        return nullptr;
+    }
+    Thread* ret = ready.front();
+    ready.pop_front();
+    return ret;
+}
+
+
+
+int removeFromReady(int id){
+    for(Thread* th: ready)
+    {
+        if(th->getId()==id)
+        {
+            ready.remove(_threads.at(id));
+            return 0;
+        }
+    }
+    return -1;
+}
+
+
+
+
+void switchThreads()
+{
+    Thread *prev = running;
+    if(prev != nullptr)   // if sent from suspend, so running is nullptr
+    {
+        prev->setState(READY);
+    }
+    Thread* next = popReady();
+    if(next != nullptr)   //that's mean that not only one thread can run now!
+    {
+        running = next;
     }
     running->setState(RUNNING);
     running->incQuantums();
     _quantum_counter++;
     setTime();
-}
-
-/*
- * returns and remove from Ready the first thread in the queue of the given priority.
- */
-Thread* getReady()
-{
-    Thread* ret = ready[0];
-    ready.erase(ready.begin());
-    return ret;
-}
-
-/*
- * returns the thread with the highest priority from Ready and removes it from there.
- * returns NULL in case there are no threads in Ready.
- */
-Thread* popReady()
-{
-    if (_threads.size() > 1) // An additional thread except the thread in the Running state.
-    {
-        if (!ready.empty())
-        {
-            return getReady();
-        }
-    }
-    else if(_threads.size() == 1)
-    {
-        return _threads.begin()->second;
-    }
-    return nullptr;
+    addReady(prev);
 }
 
 
-/*
- * removes the thread with the given tid from ready.
- */
-int removeFromReady(int tid)
-{
-    if(find(ready.begin(), ready.end(), _threads[tid]) != ready.end())
-    {
-        for (vector<Thread*>::iterator iter = ready.begin(); iter != ready.end(); ++iter)
-        {
-            if (*iter == _threads.at(tid))
-            {
-                ready.erase(iter);
-                return SUCCESS;
-            }
-        }
-    }
-    return FAIL;
-}
-
-
-/*
- * removes the thread with the given tid from blocked.
- */
-void removeFromBlock(int tid)
-{
-    for (vector<Thread*>::iterator iter = blocked.begin(); iter != blocked.end(); ++iter)
-    {
-        if (*iter == _threads.at(tid))
-        {
-            blocked.erase(iter);
-            break;
-        }
-    }
-}
-
-/**
- * switch between running thread and the next in line
- */
-void switchThreads()
-{
-    Thread *tmp = running;
-    if(tmp != nullptr)   // if sent from suspend, so running is nullptr
-    {
-        tmp->setState(READY);
-    }
-    runThread();
-    // if there are x threads in _threads and x + 1 threads in blocked, than it means that there is nothing
-    // in ready, so the current running thread should not get into ready and keep running.
-
-    addToReady(tmp);
-}
-
-/**
- * switch between running thread and the this thread
- */
 static void timeHandler(int signum)
 {
-    if (!sigsetjmp(running->getContext(),1))
+    // When val is not 0 it means we just switched so we will get to the first line with the next
+    // thread and its context and return from the handler function to its own function in the point
+    // before he last ends(the last time its time finishes)
+    bool timeOut = sigsetjmp(running->getContext(),1) == 0;
+    if (timeOut)
     {
         switchThreads();
         siglongjmp(running->getContext(),1);
@@ -281,39 +217,22 @@ int  uthread_init(int *quantum_usecs, int size)
     return SUCCESS;
 }
 
-/* Create a new thread whose entry point is f */
 
 int uthread_spawn(void (* f)(void), int pr)
 {
-    //can't add any more!!
-    if(_threads.size() == 100)
+    if (_threads.size() < 100)
     {
-        return FAIL;
-    }
-
-    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
-
-    int tid = getNextId();
-    auto* th = new Thread(tid, pr, f, READY);
-    _threads.insert(pair<int, Thread*>(tid, th));
-    if (running == NULL)  //for the first running (the main thread)
-    {
-        Thread* tmp = popReady();
-        if(tmp != nullptr)   //that's mean that not only one thread can run now!
-        {
-            running = tmp;
-        }
-        running->setState(RUNNING);
-        running->incQuantums();
-        _quantum_counter++;
-        setTime();;
+        int tid = nextId();
+        Thread *th = new Thread(tid, pr, f, READY);
+        _threads.insert(std::pair<int, Thread *>(tid, th));
+        addReady(th);
+        return tid;
     }
     else
     {
-        addToReady(th);
+        //printErrors
+        return -1;
     }
-    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
-    return tid;
 }
 
 /* Terminates a thread */
@@ -351,7 +270,7 @@ int uthread_terminate(int tid)
     }
     else // Thread is in Block.
     {
-        removeFromBlock(tid);
+        blockedCounter--;
         _threads.erase(tid);
     }
     sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
@@ -374,28 +293,38 @@ int uthread_block(int tid)
     sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
     if (tid == running->getId())
     {
-        if(sigsetjmp(running->getContext(),1) != 0)
+        bool weAfterResume = sigsetjmp(running->getContext(),1) != 0;
+        if(weAfterResume)
         {
+            return 0;
         }
         else
         {
             running->setState(BLOCK);
-            blocked.push_back(running);
-            runThread();
+            blockedCounter++;
+            Thread* next = popReady();
+            if(next != nullptr)   //that's mean that not only one thread can run now!
+            {
+                running = next;
+            }
+            running->setState(RUNNING);
+            running->incQuantums();
+            _quantum_counter++;
+            setTime();
             siglongjmp(running->getContext(), 1);
         }
     }
     else
     {
-        if(removeFromReady(_threads[tid]->getId()) == FAIL)  // Exists, not in ready and not running - in blocked.
+        if(removeFromReady(_threads[tid]->getId()) == FAIL)  // in blocked.
         {
-            sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
+            sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
             return 0;
         }
         // Was in Ready
         removeFromReady(tid);
         _threads[tid]->setState(BLOCK);
-        blocked.push_back(_threads[tid]);
+        blockedCounter++;
     }
     sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
     return SUCCESS;
@@ -408,24 +337,19 @@ int uthread_resume(int tid)
     {
         return FAIL;
     }
-    if(_threads[tid]->getState()==RUNNING)
+    if(_threads[tid]->getState() != BLOCK )
     {
-        return 0;
+        return SUCCESS;
     }
     //if not in block, don't resume
-    if(find(blocked.begin(), blocked.end(), _threads[tid]) != blocked.end())
-    {
-        sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
-        _threads[tid]->setState(READY);
-        addToReady(_threads[tid]);
-        removeFromBlock(tid);
-        sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
-        return SUCCESS;
-    }
-    else
-    {
-        return SUCCESS;
-    }
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
+    _threads[tid]->setState(READY);
+    addReady(_threads[tid]);
+    blockedCounter--;
+    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
+    return SUCCESS;
+
+
 }
 int uthread_change_priority(int tid, int priority){
     if(!_threads.count(tid))
@@ -436,34 +360,26 @@ int uthread_change_priority(int tid, int priority){
     return 0;
 }
 
-/* Get the id of the calling thread */
 int uthread_get_tid()
 {
     return running->getId();
 }
 
-/* Get the total number of library quantums */
 int uthread_get_total_quantums()
 {
     return _quantum_counter;
 }
 
-/* Get the number of thread quantums */
-int uthread_get_quantums(int tid)
-{
-    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
-    int valToRet;
-    if (!_threads.count(tid))
+int uthread_get_quantums(int tid){
+    if (_threads.count(tid))
     {
-        printError(NOT_FOUND_ID, THREAD_ERROR);
-        valToRet = FAIL;
+        sigprocmask(SIG_BLOCK, &_sigAction.sa_mask, nullptr);
+        int num = _threads.at(tid)->getQuantumsAmount();
+        sigprocmask(SIG_UNBLOCK, &_sigAction.sa_mask, nullptr);
+        return num;
     }
-    else
-    {
-        valToRet = _threads.at(tid)->getQuantumsAmount();
-    }
-    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
-    return valToRet;
+    //printErrors
+    return -1;
 }
 //
 //void f(void) {
