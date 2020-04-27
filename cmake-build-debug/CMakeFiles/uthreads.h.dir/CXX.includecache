@@ -23,19 +23,15 @@ uthreads.h
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.h
 
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.cpp
-uthreads.h
-/cs/usr/doronbruder/CLionProjects/final1/uthreads.h
 Thread.h
 /cs/usr/doronbruder/CLionProjects/final1/Thread.h
 vector
 -
-queue
+list
 -
 stdlib.h
 -
 map
--
-algorithm
 -
 
 /cs/usr/doronbruder/CLionProjects/final1/uthreads.h

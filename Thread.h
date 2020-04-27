@@ -16,8 +16,9 @@ public:
 
     Thread(int tid, int pr, void (*f)(void), State state);
 
-    ~Thread();
+//    ~Thread();
 
+    char* getStack();
 
     void setState(State state);
 

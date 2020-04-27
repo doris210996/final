@@ -138,10 +138,7 @@ int removeFromReady(int id){
 void switchThreads()
 {
     Thread *prev = running;
-    if(prev != nullptr)   // if sent from suspend, so running is nullptr
-    {
-        prev->setState(READY);
-    }
+    prev->setState(READY);
     Thread* next = popReady();
     if(next != nullptr)   //that's mean that not only one thread can run now!
     {
@@ -151,7 +148,10 @@ void switchThreads()
     running->incQuantums();
     _quantum_counter++;
     setTime();
-    addReady(prev);
+    if(prev->getId() != running->getId())
+    {
+        addReady(prev);
+    }
 }
 
 
@@ -205,9 +205,8 @@ int  uthread_init(int *quantum_usecs, int size)
         printError(SIGNAL_ACTION_ERROR, SYS_ERROR);
         exit(1);
     }
-
     quantums = std::vector<int> (quantum_usecs, quantum_usecs + size);
-    Thread* mainTh = new Thread(0, 0, nullptr, READY);
+    auto* mainTh = new Thread(0, 0, nullptr, READY);
     _threads.insert(pair<int, Thread*>(0, mainTh));
     running = mainTh;
     mainTh->setState(RUNNING);
@@ -241,7 +240,10 @@ int uthread_terminate(int tid)
     //terminate main
     if (tid == MAIN_THREAD)
     {
-        _threads.clear();
+        for (auto it = _threads.begin(); it != _threads.end(); /* don't increment here*/) {
+            it = _threads.erase(it);
+        }
+//        _threads.clear();
         exit(0);
     }
 
@@ -381,73 +383,3 @@ int uthread_get_quantums(int tid){
     //printErrors
     return -1;
 }
-//
-//void f(void) {
-////    uthread_block(1);
-//
-//    int i = 0;
-//    while (1) {
-//        ++i;
-//
-//        if (i % 100000000 == 0) {
-//
-//            printf("in f (%d)\n", i);
-//
-//
-//        }
-//
-//    }
-//}
-//
-//
-//void g(void) {
-//    int i = 0;
-//
-//    while (1) {
-//
-//        ++i;
-//        if (i % 100000000 == 0) {
-//            printf("in g (%d)\n", i);
-//
-//        }
-//
-//    }
-//}
-//
-//void h(void) {
-////    uthread_resume(1);
-//
-//    int i = 0;
-//    while (1) {
-//        ++i;
-//        if (i % 100000000 == 0) {
-//            printf("in h (%d)\n", i);
-//
-//
-//        }
-//    }
-//}
-//
-//int main() {
-//    int quan[8] = {99999, 900000, 800000, 100000 - 20000, 100000 - 30000, 100000 - 40000, 100000 - 50000,
-//                   100000 - 60000};
-//    uthread_init(quan, 8);
-//    int i = 0;
-////    while (1) {
-////        if (i % 3 == 0) {
-//            printf("%d\n", uthread_spawn(&f, 1));
-////        } else if (i % 3 == 1) {
-//            printf("%d\n", uthread_spawn(&g, 2));
-////        } else {
-//            printf("%d\n", uthread_spawn(&h, 1));
-////        }
-////        uthread_block(2);
-//        printf("in main");
-//        ++i;
-////    }
-//    while (true) {
-//    }
-//
-//
-//    return 0;
-//}

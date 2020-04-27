@@ -62,11 +62,14 @@ Thread::Thread(int tid, int pr, void (*f)(void), State state): _tid(tid), _pr(pr
     sigemptyset(&_jmp_buf->__saved_mask);
 }
 
-Thread::~Thread()
-{
-    delete[] _stack;
-}
+//Thread::~Thread()
+//{
+//    delete[] _stack;
+//}
 
+char* Thread::getStack(){
+    return _stack;
+}
 void Thread::setState(State state)
 {
     _state = state;
