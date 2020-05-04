@@ -17,20 +17,19 @@ using namespace std;
 #define SIGNAL_ACTION_ERROR 4
 #define TOO_MANY_THREADS 5
 static int blockedCounter;
-static list<Thread*> ready;
-static Thread* running; // The "Running" thread.
+static list<int > ready;
+static int running; // The "Running" thread.
 static map<int, Thread*> _threads;
 static int _quantum_counter = 0;
 struct itimerval _timer;
 struct sigaction _sigAction;
-int* sig;
 static vector<int> quantums;
 
 
 /**
- * function responsable for printing each kind of error
+ * function for printing each kind of error
  */
-void printError(int type, string pre)
+void printError(int type, const string& pre)
 {
     switch (type)
     {
@@ -69,7 +68,9 @@ void printError(int type, string pre)
     }
 }
 
-
+/**
+ * function for get the next available tid
+ */
 int nextId()
 {
     for(int i =0; i <100; i++)
@@ -79,13 +80,15 @@ int nextId()
             return i;
         }
     }
-    return -1;
+    return FAIL;
 }
 
-
-void addReady(Thread* th)
+/**
+ * function for adding the thread with the given tid to the ready queue
+ */
+void addReady(int th)
 {
-    if(th == nullptr)
+    if(th == FAIL)
     {
         return;
     }
@@ -94,12 +97,14 @@ void addReady(Thread* th)
 }
 
 
-
+/**
+ * function to start the timer for recall the signal
+ */
 static void setTime()
 {
-    _timer.it_value.tv_sec = (int)(quantums[running->getPriority()]/MICRO_TO_SECOND);
-    _timer.it_value.tv_usec = quantums[running->getPriority()] % MICRO_TO_SECOND;
-    if (setitimer(ITIMER_VIRTUAL, &_timer, NULL) == FAIL)
+    _timer.it_value.tv_sec = (int)(quantums[_threads[running]->getPriority()]/MICRO_TO_SECOND);
+    _timer.it_value.tv_usec = quantums[_threads[running]->getPriority()] % MICRO_TO_SECOND;
+    if (setitimer(ITIMER_VIRTUAL, &_timer, nullptr) == FAIL)
     {
         printError(SET_TIME_ERROR, SYS_ERROR);
         exit(1);
@@ -107,70 +112,86 @@ static void setTime()
 }
 
 
-
-Thread* popReady(){
+/**
+ * function to pop the first thread from the ready queue (robin algorithm)
+ */
+int popReady(){
     if(ready.empty())
     {
-        return nullptr;
+        return FAIL;
     }
-    Thread* ret = ready.front();
+    int ret = ready.front();
     ready.pop_front();
     return ret;
 }
 
 
-
+/**
+ * function to remove the thread with the given tid from the queue
+ */
 int removeFromReady(int id){
-    for(Thread* th: ready)
+    for(int th: ready)
     {
-        if(th->getId()==id)
+        if(th == id)
         {
-            ready.remove(_threads.at(id));
-            return 0;
+            ready.remove(id);
+            return SUCCESS;
         }
     }
-    return -1;
+    return FAIL;
 }
 
 
 
-
+/**
+ * function to switch between threads
+ */
 void switchThreads()
 {
-    Thread *prev = running;
-    prev->setState(READY);
-    Thread* next = popReady();
-    if(next != nullptr)   //that's mean that not only one thread can run now!
+    int prev = running;
+    _threads[prev]->setState(READY);
+    int next = popReady();
+    if(next != -1)   //that's mean that not only one thread can run now!
     {
         running = next;
     }
-    running->setState(RUNNING);
-    running->incQuantums();
+    _threads[running]->setState(RUNNING);
+    _threads[running]->incQuantums();
     _quantum_counter++;
     setTime();
-    if(prev->getId() != running->getId())
+    if(_threads[prev]->getId() != _threads[running]->getId())
     {
         addReady(prev);
     }
 }
 
-
-static void timeHandler(int signum)
+/**
+ * This function is called when the time is out it replaces the natural behaviour of the signal
+ */
+static void timeHandler(int)
 {
     // When val is not 0 it means we just switched so we will get to the first line with the next
     // thread and its context and return from the handler function to its own function in the point
     // before he last ends(the last time its time finishes)
-    bool timeOut = sigsetjmp(running->getContext(),1) == 0;
+    bool timeOut = sigsetjmp(_threads[running]->getContext(),1) == 0;
     if (timeOut)
     {
         switchThreads();
-        siglongjmp(running->getContext(),1);
+        siglongjmp(_threads[running]->getContext(),1);
     }
 }
 
 
 
-/* Initialize the thread library */
+/*
+ * Description: This function initializes the thread library.
+ * You may assume that this function is called before any other thread library
+ * function, and that it is called exactly once. The input to the function is
+ * an array of the length of a quantum in micro-seconds for each priority.
+ * It is an error to call this function with an array containing non-positive integer.
+ * size - is the size of the array.
+ * Return value: On success, return 0. On failure, return -1.
+*/
 int  uthread_init(int *quantum_usecs, int size)
 
 {
@@ -200,7 +221,7 @@ int  uthread_init(int *quantum_usecs, int size)
         exit(1);
     }
     _sigAction.sa_flags = 0;
-    if(sigaction(SIGVTALRM,&_sigAction,NULL) == FAIL)
+    if(sigaction(SIGVTALRM,&_sigAction,nullptr) == FAIL)
     {
         printError(SIGNAL_ACTION_ERROR, SYS_ERROR);
         exit(1);
@@ -208,7 +229,7 @@ int  uthread_init(int *quantum_usecs, int size)
     quantums = std::vector<int> (quantum_usecs, quantum_usecs + size);
     auto* mainTh = new Thread(0, 0, nullptr, READY);
     _threads.insert(pair<int, Thread*>(0, mainTh));
-    running = mainTh;
+    running = 0;
     mainTh->setState(RUNNING);
     mainTh->incQuantums();
     _quantum_counter++;
@@ -216,37 +237,56 @@ int  uthread_init(int *quantum_usecs, int size)
     return SUCCESS;
 }
 
-
-int uthread_spawn(void (* f)(void), int pr)
+/*
+ * Description: This function creates a new thread, whose entry point is the
+ * function f with the signature void f(void). The thread is added to the end
+ * of the READY threads list. The uthread_spawn function should fail if it
+ * would cause the number of concurrent threads to exceed the limit
+ * (MAX_THREAD_NUM). Each thread should be allocated with a stack of size
+ * STACK_SIZE bytes.
+ * priority - The priority of the new thread.
+ * Return value: On success, return the ID of the created thread.
+ * On failure, return -1.
+*/
+int uthread_spawn(void (* f)(), int pr)
 {
     if (_threads.size() < 100)
     {
         int tid = nextId();
-        Thread *th = new Thread(tid, pr, f, READY);
+        auto *th = new Thread(tid, pr, f, READY);
         _threads.insert(std::pair<int, Thread *>(tid, th));
-        addReady(th);
+        addReady(tid);
         return tid;
     }
     else
     {
-        //printErrors
+        printError(TOO_MANY_THREADS,THREAD_ERROR);
         return -1;
     }
 }
 
-/* Terminates a thread */
+/*
+ * Description: This function terminates the thread with ID tid and deletes
+ * it from all relevant control structures. All the resources allocated by
+ * the library for this thread should be released. If no thread with ID tid
+ * exists it is considered an error. Terminating the main thread
+ * (tid == 0) will result in the termination of the entire process using
+ * exit(0) [after releasing the assigned library memory].
+ * Return value: The function returns 0 if the thread was successfully
+ * terminated and -1 otherwise. If a thread terminates itself or the main
+ * thread is terminated, the function does not return.
+*/
 int uthread_terminate(int tid)
 {
     //terminate main
     if (tid == MAIN_THREAD)
     {
-        for (auto it = _threads.begin(); it != _threads.end(); /* don't increment here*/) {
-            it = _threads.erase(it);
+        for (auto & _thread : _threads) {
+            delete []_thread.second->getStack();
+            delete _thread.second;
         }
-//        _threads.clear();
         exit(0);
     }
-
     //not found id
     if (!_threads.count(tid))
     {
@@ -254,15 +294,15 @@ int uthread_terminate(int tid)
         return FAIL;
     }
 
-    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, nullptr);
     //running terminate itself
-    if (tid == running->getId())
+    if (tid == running)
     {
-        Thread* temp = running;
+        int temp = running;
         switchThreads();
         removeFromReady(tid);
-        _threads.erase(temp->getId());
-        siglongjmp(running->getContext(),1);
+        _threads.erase(temp);
+        siglongjmp(_threads[running]->getContext(),1);
     }
     // The termination is for a thread that in ready.
     if (_threads.at(tid)->getState() == READY)
@@ -275,11 +315,19 @@ int uthread_terminate(int tid)
         blockedCounter--;
         _threads.erase(tid);
     }
-    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
+    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
     return SUCCESS;
 }
 
-/* Suspend a thread */
+/*
+ * Description: This function blocks the thread with ID tid. The thread may
+ * be resumed later using uthread_resume. If no thread with ID tid exists it
+ * is considered as an error. In addition, it is an error to try blocking the
+ * main thread (tid == 0). If a thread blocks itself, a scheduling decision
+ * should be made. Blocking a thread in BLOCKED state has no
+ * effect and is not considered an error.
+ * Return value: On success, return 0. On failure, return -1.
+*/
 int uthread_block(int tid)
 {
     if (tid == MAIN_THREAD)
@@ -292,28 +340,29 @@ int uthread_block(int tid)
         printError(NOT_FOUND_ID, THREAD_ERROR);
         return FAIL;
     }
-    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
-    if (tid == running->getId())
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, nullptr);
+    if (tid == running)
     {
-        bool weAfterResume = sigsetjmp(running->getContext(),1) != 0;
+        bool weAfterResume = sigsetjmp(_threads[running]->getContext(),1) != 0;
         if(weAfterResume)
         {
-            return 0;
+            sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
+            return SUCCESS;
         }
         else
         {
-            running->setState(BLOCK);
+            _threads[running]->setState(BLOCK);
             blockedCounter++;
-            Thread* next = popReady();
-            if(next != nullptr)   //that's mean that not only one thread can run now!
+            int next = popReady();
+            if(next != -1)   //that's mean that not only one thread can run now!
             {
                 running = next;
             }
-            running->setState(RUNNING);
-            running->incQuantums();
+            _threads[running]->setState(RUNNING);
+            _threads[running]->incQuantums();
             _quantum_counter++;
             setTime();
-            siglongjmp(running->getContext(), 1);
+            siglongjmp(_threads[running]->getContext(), 1);
         }
     }
     else
@@ -321,22 +370,29 @@ int uthread_block(int tid)
         if(removeFromReady(_threads[tid]->getId()) == FAIL)  // in blocked.
         {
             sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
-            return 0;
+            return SUCCESS;
         }
         // Was in Ready
         removeFromReady(tid);
         _threads[tid]->setState(BLOCK);
         blockedCounter++;
     }
-    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
+    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
     return SUCCESS;
 }
 
-/* Resume a thread */
+/*
+ * Description: This function resumes a _blocked thread with ID tid and moves
+ * it to the READY state if it's not synced. Resuming a thread in a RUNNING or READY state
+ * has no effect and is not considered as an error. If no thread with
+ * ID tid exists it is considered an error.
+ * Return value: On success, return 0. On failure, return -1.
+*/
 int uthread_resume(int tid)
 {
     if(!_threads.count(tid))
     {
+        printError(NOT_FOUND_ID,THREAD_ERROR);
         return FAIL;
     }
     if(_threads[tid]->getState() != BLOCK )
@@ -344,34 +400,66 @@ int uthread_resume(int tid)
         return SUCCESS;
     }
     //if not in block, don't resume
-    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, NULL);
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, nullptr);
     _threads[tid]->setState(READY);
-    addReady(_threads[tid]);
+    addReady(tid);
     blockedCounter--;
-    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, NULL);
+    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
     return SUCCESS;
 
 
 }
+
+/*
+ * Description: This function changes the priority of the thread with ID tid.
+ * If this is the current running thread, the effect should take place only the
+ * next time the thread gets scheduled.
+ * Return value: On success, return 0. On failure, return -1.
+*/
 int uthread_change_priority(int tid, int priority){
     if(!_threads.count(tid))
     {
-        return -1;
+        printError(NOT_FOUND_ID,THREAD_ERROR);
+        return FAIL;
     }
+    sigprocmask(SIG_BLOCK,&_sigAction.sa_mask, nullptr);
     _threads[tid]->setPriority(priority);
-    return 0;
+    sigprocmask(SIG_UNBLOCK,&_sigAction.sa_mask, nullptr);
+    return SUCCESS;
 }
 
+/*
+ * Description: This function returns the thread ID of the calling thread.
+ * Return value: The ID of the calling thread.
+*/
 int uthread_get_tid()
 {
-    return running->getId();
+    return running;
 }
 
+/*
+ * Description: This function returns the total number of _quantums since
+ * the library was initialized, including the current quantum.
+ * Right after the call to uthread_init, the value should be 1.
+ * Each time a new quantum starts, regardless of the reason, this number
+ * should be increased by 1.
+ * Return value: The total number of _quantums.
+*/
 int uthread_get_total_quantums()
 {
     return _quantum_counter;
 }
 
+/*
+ * Description: This function returns the number of _quantums the thread with
+ * ID tid was in RUNNING state. On the first time a thread runs, the function
+ * should return 1. Every additional quantum that the thread starts should
+ * increase this value by 1 (so if the thread with ID tid is in RUNNING state
+ * when this function is called, include also the current quantum). If no
+ * thread with ID tid exists it is considered an error.
+ * Return value: On success, return the number of _quantums of the thread with ID tid.
+ * 			     On failure, return -1.
+*/
 int uthread_get_quantums(int tid){
     if (_threads.count(tid))
     {
@@ -380,6 +468,6 @@ int uthread_get_quantums(int tid){
         sigprocmask(SIG_UNBLOCK, &_sigAction.sa_mask, nullptr);
         return num;
     }
-    //printErrors
-    return -1;
+    printError(NOT_FOUND_ID,THREAD_ERROR);
+    return FAIL;
 }
